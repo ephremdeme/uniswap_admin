@@ -30,8 +30,32 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [],
+  modules: ['@nuxtjs/axios', '@nuxtjs/auth-next'],
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    transpile: ['defu'],
+  },
+  router: {
+    middleware: ['auth'],
+  },
+  auth: {
+    strategies: {
+      local: {
+        token: {
+          property: 'token',
+          global: true,
+          type: 'Bearer',
+          // required: true,
+        },
+        endpoints: {
+          login: { url: '/login', method: 'post' },
+          user: false,
+        },
+      },
+    },
+  },
+  axios: {
+    baseURL: 'http://localhost:5005',
+  },
 }
