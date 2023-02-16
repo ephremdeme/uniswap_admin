@@ -1,0 +1,94 @@
+<template>
+  <a-layout id="components-layout">
+    <a-layout-sider
+      breakpoint="lg"
+      collapsed-width="0"
+      @collapse="onCollapse"
+      @breakpoint="onBreakpoint"
+    >
+      <div class="logo" />
+      <a-menu theme="dark" mode="inline" :default-selected-keys="['4']">
+        <a-menu-item key="1">
+          <NuxtLink to="/wallet">
+            <a-icon type="wallet" />
+            <span class="nav-text">Wallet</span>
+          </NuxtLink>
+        </a-menu-item>
+        <a-menu-item key="2">
+          <NuxtLink to="">
+            <a-icon type="euro" />
+            <span class="nav-text">Tokens</span>
+          </NuxtLink>
+        </a-menu-item>
+        <a-menu-item key="3">
+          <NuxtLink to="">
+            <a-icon type="gold" />
+            <span class="nav-text">Liquidity</span>
+          </NuxtLink>
+        </a-menu-item>
+        <a-menu-item key="4">
+          <NuxtLink to="">
+            <a-icon type="swap" />
+            <span class="nav-text">Swap</span>
+          </NuxtLink>
+        </a-menu-item>
+        <a-menu-item key="5">
+          <NuxtLink to="">
+            <a-icon type="fund" />
+            <span class="nav-text">Farms</span>
+          </NuxtLink>
+        </a-menu-item>
+        <!-- Logout -->
+        <a-menu-item key="6" @click="onLogout">
+            <a-icon type="logout" />
+            <span class="nav-text">Logout</span>
+        </a-menu-item>
+      </a-menu>
+    </a-layout-sider>
+    <a-layout>
+      <a-layout-header :style="{ background: '#fff', padding: 0 }" />
+      <a-layout-content :style="{ margin: '24px 16px 0' }">
+        <div
+          :style="{ padding: '24px', background: '#fff', minHeight: '360px' }"
+        >
+          <Nuxt />
+        </div>
+      </a-layout-content>
+      <a-layout-footer style="textalign: center">
+        Box Exchanger ©2023 Created by Box Exchanger
+      </a-layout-footer>
+    </a-layout>
+  </a-layout>
+</template>
+<script lang="js">
+export default {
+  methods: {
+    onCollapse(collapsed, type) {
+      console.log(collapsed, type);
+    },
+    onBreakpoint(broken) {
+      console.log(broken);
+    },
+    onLogout() {
+      this.$auth.logout().then(() => {
+        console.log("Logged out");
+        this.$router.push("/login");
+      })
+      // go to login page
+    },
+  },
+};
+</script>
+
+<style>
+#components-layout {
+  height: 100vh;
+  width: 100%;
+}
+
+#components-layout .logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}
+</style>
