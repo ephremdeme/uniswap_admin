@@ -56,6 +56,6 @@ export default {
     },
   },
   axios: {
-    baseURL: 'http://localhost:5005',
+    baseURL: 'https://uniswapsample-production.up.railway.app',
   },
 }
