@@ -1,7 +1,4 @@
 <template>
-  <!-- 
-    Generate a custom error page using antdv components
-   -->
     <a-layout-content :style="{ margin: '24px 16px 0' }">
       <div :style="{ padding: '24px', minHeight: '360px' }">
         <div class="container">
