@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import AddWallet from '../components/wallets/AddWallet.vue'
+import AddWallet from '../../components/wallets/AddWallet.vue'
 
 export default {
   name: 'IndexPage',
@@ -31,6 +31,9 @@ export default {
           dataIndex: 'name',
           key: 'name',
           width: 200,
+          customRender: (text, record) => (
+            <NuxtLink to={`/wallets/${record._id}`}>{text}</NuxtLink>
+          ),
         },
 
         {
