@@ -3,13 +3,16 @@
     <Table
       :columns="columns"
       :data="data"
-      :onSubmit="onSubmit"
-      :onDelete="onDelete"
+      :on-submit="onSubmit"
+      :on-delete="onDelete"
+      :form-component="AddToken"
     />
   </div>
 </template>
 
 <script>
+import AddToken from '../components/tokens/AddToken.vue'
+
 export default {
   name: 'IndexPage',
   // get data from /api/tokes
@@ -17,7 +20,6 @@ export default {
     const { data } = await $axios.get('/api/tokens')
     return { data }
   },
-
   data() {
     return {
       columns: [
@@ -32,6 +34,7 @@ export default {
           dataIndex: 'symbol',
           key: 'symbol',
           width: 80,
+          scopedSlots: { customRender: 'tags' },
         },
         {
           title: 'Address',
@@ -46,24 +49,46 @@ export default {
           scopedSlots: { customRender: 'action' },
         },
       ],
+      AddToken,
     }
   },
   methods: {
     onSubmit(record) {
       // this.$router.push(`/tokens/${record.id}`)
-      console.log(record);
+      if (record._id) {
+        this.$axios
+          .put(`/api/tokens/${record._id}`, record)
+          .then(() => {
+            this.$message.success('Update success')
+            this.$nuxt.refresh()
+          })
+          .catch((err) => {
+            this.$message.error(err || 'Update failed. Check token address.')
+          })
+      } else {
+        this.$axios
+          .post('/api/tokens', record)
+          .then(() => {
+            this.$message.success('Create success')
+            this.$nuxt.refresh()
+          })
+          .catch((err) => {
+            this.$message.error(err || 'Create failed. Check token address.')
+          })
+      }
     },
     onDelete(record) {
-      this.$axios.delete(`/api/tokens/${record._id}`).then(() => {
-        this.$message.success('Delete success')
-        this.$router.push('/')
-      })
-    },
-    onAdd() {
-      this.$router.push('/tokens/new')
+      this.$axios
+        .delete(`/api/tokens/${record._id}`)
+        .then(() => {
+          this.$message.success('Delete success')
+          this.$router.push('/')
+          this.$nuxt.refresh()
+        })
+        .catch((err) => {
+          this.$message.error(err || 'Delete failed')
+        })
     },
   },
-
-
 }
 </script>
