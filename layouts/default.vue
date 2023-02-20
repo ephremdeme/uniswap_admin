@@ -15,7 +15,7 @@
           </NuxtLink>
         </a-menu-item>
         <a-menu-item key="2">
-          <NuxtLink to="">
+          <NuxtLink to="/tokens">
             <a-icon type="euro" />
             <span class="nav-text">Tokens</span>
           </NuxtLink>
@@ -40,8 +40,8 @@
         </a-menu-item>
         <!-- Logout -->
         <a-menu-item key="6" @click="onLogout">
-            <a-icon type="logout" />
-            <span class="nav-text">Logout</span>
+          <a-icon type="logout" />
+          <span class="nav-text">Logout</span>
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
