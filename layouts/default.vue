@@ -9,7 +9,7 @@
       <div class="logo" />
       <a-menu theme="dark" mode="inline" :default-selected-keys="['4']">
         <a-menu-item key="1">
-          <NuxtLink to="/wallet">
+          <NuxtLink to="/wallets">
             <a-icon type="wallet" />
             <span class="nav-text">Wallet</span>
           </NuxtLink>
@@ -55,7 +55,7 @@
         </div>
       </a-layout-content>
       <a-layout-footer style="textalign: center">
-        Box Exchanger ©2023 Created by Box Exchanger
+        Created by Ephrem ©2023 
       </a-layout-footer>
     </a-layout>
   </a-layout>

@@ -79,7 +79,6 @@ export default {
         .delete(`/api/accounts/${record._id}`)
         .then(() => {
           this.$message.success('Delete success')
-          this.$router.push('/')
           this.$nuxt.refresh()
         })
         .catch((err) => {
