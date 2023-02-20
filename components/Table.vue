@@ -16,8 +16,8 @@
       </span>
 
       <template slot="action" slot-scope="text, record">
-        <a-button type="primary" @click="onEdit(record)">Edit</a-button>
-        <a-button type="danger" @click="onDelete(record)">Delete</a-button>
+        <a-button v-if="allowEdit" type="primary" @click="onEdit(record)">Edit</a-button>
+        <a-button v-if="allowDelete" type="danger" @click="onDelete(record)">Delete</a-button>
       </template>
     </a-table>
     <a-modal
@@ -63,6 +63,14 @@ export default {
     formComponent: {
       type: Object,
       default: () => {},
+    },
+    allowEdit: {
+      type: Boolean,
+      default: true,
+    },
+    allowDelete: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
