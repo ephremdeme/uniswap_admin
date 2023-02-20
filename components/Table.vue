@@ -7,12 +7,14 @@
       :pagination="false"
       :scroll="{ x: 1300 }"
       :row-key="(record) => record.id"
+      bordered
     >
       <span slot="tags" slot-scope="tag">
         <a-tag :color="'green'">
           {{ tag.toUpperCase() }}
         </a-tag>
       </span>
+
       <template slot="action" slot-scope="text, record">
         <a-button type="primary" @click="onEdit(record)">Edit</a-button>
         <a-button type="danger" @click="onDelete(record)">Delete</a-button>
