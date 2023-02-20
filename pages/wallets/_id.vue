@@ -28,9 +28,12 @@
         <h3>Tokens</h3>
         <Table
           :columns="columns"
-          :data-source="data.tokens"
+          :data="tokens"
           :pagination="false"
           :form-component="AddToken"
+          :allow-edit="false"
+          :on-submit="onSubmit"
+          :on-delete="onDelete"
         />
       </div>
     </div>
@@ -45,7 +48,10 @@ export default {
   // get data from /api/accounts/:id
   async asyncData({ $axios, params }) {
     const { data } = await $axios.get(`/api/accounts/${params.id}`)
-    return { data }
+    const { data: tokens } = await $axios.get(
+      `/api/accounts/${params.id}/tokens`
+    )
+    return { data, tokens }
   },
   data() {
     return {
@@ -61,6 +67,7 @@ export default {
           dataIndex: 'symbol',
           key: 'symbol',
           width: 80,
+          scopedSlots: { customRender: 'tags' },
         },
         {
           title: 'Address',
