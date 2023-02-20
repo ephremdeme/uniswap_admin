@@ -1,89 +1,100 @@
-<!-- Antdv V1.7
-Generate a table with a fixed header and a fixed footer.
-And the table can be scrolled horizontally and have an edit and delete button.
-Accepts a column array and a data array, onEdit, onDelete and onAdd functions.
--->
-
 <template>
   <div class="table">
-    <a-button class="add-btn" type="primary" @click="onAdd">Add</a-button>
-
+    <a-button class="add-btn" type="primary" @click="showModal">Add</a-button>
     <a-table
       :columns="columns"
       :data-source="data"
-      :pagination="true"
+      :pagination="false"
+      :scroll="{ x: 1300 }"
       :row-key="(record) => record.id"
-      bordered
     >
+      <span slot="tags" slot-scope="tag">
+        <a-tag :color="'green'">
+          {{ tag.toUpperCase() }}
+        </a-tag>
+      </span>
       <template slot="action" slot-scope="text, record">
         <a-button type="primary" @click="onEdit(record)">Edit</a-button>
-        <a-popconfirm
-          v-if="data.length"
-          title="Sure to delete?"
-          @confirm="() => onDelete(record)"
-        >
-          <a-button type="danger">Delete</a-button>
-        </a-popconfirm>
+        <a-button type="danger" @click="onDelete(record)">Delete</a-button>
       </template>
     </a-table>
-    <AddToken
+    <a-modal
       :visible="visible"
       :title="title"
-      :data="record"
-      :onCancel="onCancel"
-      :onOk="onSubmit"
-    />
+      :footer="null"
+      @cancel="handleCancel"
+    >
+      <component
+        :is="formComponent"
+        :form-data="formData"
+        :on-submit="handleSubmit"
+      />
+    </a-modal>
   </div>
 </template>
 
 <script>
+import { Modal } from 'ant-design-vue'
+
 export default {
   name: 'NuxtTable',
   components: {
-    AddToken: () => import('~/components/tokens/AddToken.vue'),
+    'a-modal': Modal,
   },
   props: {
     columns: {
       type: Array,
-      required: true,
+      default: () => [],
     },
     data: {
       type: Array,
-      required: true,
-    },
-    onSubmit: {
-      type: Function,
-      required: true,
+      default: () => [],
     },
     onDelete: {
       type: Function,
-      required: true,
+      default: () => {},
+    },
+    onSubmit: {
+      type: Function,
+      default: () => {},
+    },
+    formComponent: {
+      type: Object,
+      default: () => {},
     },
   },
   data() {
     return {
       visible: false,
       title: '',
-      record: {},
+      confirmLoading: false,
+      formData: {},
     }
   },
   methods: {
-    onEdit(record) {
+    showModal() {
+      this.title = 'Add'
       this.visible = true
-      this.title = 'Edit Token'
-      this.record = record
-      this.$emit('edit', record)
+    },
+    handleCancel() {
+      this.visible = false
+      this.formData = {}
+    },
+    handleSubmit(data) {
+      this.confirmLoading = true
+      this.visible = false
+      this.onSubmit(data)
+      this.confirmLoading = false
+    },
+    onEdit(record) {
+      this.title = 'Edit'
+      this.visible = true
+      this.formData = record
     },
     onAdd() {
+      this.title = 'Add'
       this.visible = true
-      this.title = 'Add Token'
-      this.$emit('add')
-    },
-    onCancel() {
-      this.visible = false
-      this.record = {}
-
-      this.$emit('cancel')
+      this.formData = {}
     },
   },
 }
