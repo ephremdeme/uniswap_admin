@@ -11,16 +11,6 @@
           ]"
         />
       </a-form-item>
-      <a-form-item label="Private Key">
-        <a-input
-          v-decorator="[
-            'privateKey',
-            {
-              rules: [{ required: true, message: 'Please input private key!' }],
-            },
-          ]"
-        />
-      </a-form-item>
 
       <a-form-item>
         <a-button type="primary" html-type="submit" :loading="loading">
@@ -62,10 +52,10 @@ export default {
   watch: {
     formData: {
       handler: function (val, oldVal) {
-        if (val && oldVal && val.privateKey !== oldVal.privateKey) {
+        if (val && oldVal && val.name !== oldVal.name) {
           this.form.setFieldsValue(val)
         }
-        if (!val || !val.privateKey) {
+        if (!val || !val.name) {
           this.form.resetFields()
         }
 

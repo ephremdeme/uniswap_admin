@@ -1,15 +1,3 @@
-<!-- 
-    Path: pages/wallets/_id.vue
-    Get data from /api/accounts/:id and display it to show the detail of the wallet.
-
-    List all the tokens that the wallet has and display the balance of each token.
-
-    Add a button to add a new token to the wallet by selecting a token from the list of tokens to the api /api/accounts/:id/tokens 
-    and display the new token in the list of tokens that the wallet has.
-
-    The form should be a one field form with a dropdown list of tokens that the wallet does not have yet.
- -->
-
 <template>
   <div class="container">
     <div class="row">
@@ -21,9 +9,9 @@
             <p>{{ data.name }}</p>
           </div>
           <div class="col-md-6">
-            <h3>Private Key</h3>
-            <p>{{ data.privateKey }}</p>
-          </div>
+            <h3>Wallet Address</h3>
+            <p>{{ data.address }}</p>
+            </div>
         </div>
         <h3>Tokens</h3>
         <Table
