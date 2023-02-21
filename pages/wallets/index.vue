@@ -37,9 +37,9 @@ export default {
         },
 
         {
-          title: 'Private Key',
-          dataIndex: 'privateKey',
-          key: 'privateKey',
+          title: 'Wallet Address',
+          dataIndex: 'address',
+          key: 'address',
           width: 200,
         },
         {
