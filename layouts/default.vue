@@ -27,7 +27,7 @@
           </NuxtLink>
         </a-menu-item>
         <a-menu-item key="4">
-          <NuxtLink to="">
+          <NuxtLink to="/swap">
             <a-icon type="swap" />
             <span class="nav-text">Swap</span>
           </NuxtLink>
