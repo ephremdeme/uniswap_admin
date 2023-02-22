@@ -54,8 +54,8 @@
           <Nuxt />
         </div>
       </a-layout-content>
-      <a-layout-footer style="textalign: center">
-        Created by Ephrem ©2023 
+      <a-layout-footer :style="{ textAlign: 'center' }">
+        Company Name ©{{ new Date().getFullYear() }}
       </a-layout-footer>
     </a-layout>
   </a-layout>
@@ -64,14 +64,11 @@
 export default {
   methods: {
     onCollapse(collapsed, type) {
-      console.log(collapsed, type);
     },
     onBreakpoint(broken) {
-      console.log(broken);
     },
     onLogout() {
       this.$auth.logout().then(() => {
-        console.log("Logged out");
         this.$router.push("/login");
       })
       // go to login page
