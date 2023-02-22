@@ -21,7 +21,7 @@
           </NuxtLink>
         </a-menu-item>
         <a-menu-item key="3">
-          <NuxtLink to="">
+          <NuxtLink to="/liquidity">
             <a-icon type="gold" />
             <span class="nav-text">Liquidity</span>
           </NuxtLink>
@@ -32,12 +32,7 @@
             <span class="nav-text">Swap</span>
           </NuxtLink>
         </a-menu-item>
-        <a-menu-item key="5">
-          <NuxtLink to="">
-            <a-icon type="fund" />
-            <span class="nav-text">Farms</span>
-          </NuxtLink>
-        </a-menu-item>
+        
         <!-- Logout -->
         <a-menu-item key="6" @click="onLogout">
           <a-icon type="logout" />
