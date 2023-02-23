@@ -1,6 +1,6 @@
 <template>
   <div class="table">
-    <a-button class="add-btn" type="primary" @click="showModal">Add</a-button>
+    <a-button v-if="formComponent" class="add-btn" type="primary" @click="showModal">Add</a-button>
     <a-table
       :columns="columns"
       :data-source="data"
