@@ -24,7 +24,8 @@
       </a-form-item>
     </a-form>
     <a-divider />
-    <a-table :columns="columns" :data-source="liquidity" :pagination="false" />
+
+    <Table :columns="columns" :data="liquidity" />
   </div>
 </template>
 
@@ -59,28 +60,67 @@ export default {
       labelCol: { span: 5 },
       wrapperCol: { span: 12 },
       loading: false,
+
       columns: [
         {
-          title: 'Token',
-          dataIndex: 'token',
-          key: 'token',
-          render: (text, record) => <a-tag color="blue">{text}</a-tag>,
+          title: 'ID',
+          dataIndex: 'id',
+          key: 'ids',
         },
         {
-          title: 'Amount',
-          dataIndex: 'amount',
-          key: 'amount',
+          title: 'Address',
+          dataIndex: 'owner',
+          key: 'owner',
         },
         {
-          title: 'Action',
-          key: 'action',
-          render: (text, record) => (
-            <a-button
-              type="danger"
-              onClick={() => this.removeLiquidity(record)}
-            >
-              Remove
-            </a-button>
+          title: 'Symbol0',
+          dataIndex: 'token0.symbol',
+          key: 'symbol0',
+          scopedSlots: { customRender: 'tags' },
+        },
+        {
+          title: 'Balance0',
+          dataIndex: 'balance0',
+          key: 'balance0',
+        },
+        {
+          title: 'Symbol1',
+          dataIndex: 'token1.symbol',
+          key: 'symbol1',
+          scopedSlots: { customRender: 'tags' },
+        },
+        {
+          title: 'Balance1',
+          dataIndex: 'balance1',
+          key: 'balance1',
+        },
+        {
+          title: 'Liquidty',
+          dataIndex: 'liquidity',
+          key: 'liquidity',
+        },
+        {
+          title: 'Stoploss',
+          dataIndex: 'stoploss',
+          key: 'stoploss',
+          customRender: (text, record) => (
+            <div>
+              <a-input-number
+                min={0}
+                max={100}
+                defaultValue={0}
+                formatter={(value) => `${value}%`}
+                parser={(value) => value.replace('%', '')}
+                onChange="handleStoplossChange(value, record)"
+              />
+              <button
+                class="ant-btn ant-btn-primary"
+                onChange="handleStoplossClick(record)"
+              >
+                Set
+              </button>
+
+            </div>
           ),
         },
       ],
@@ -122,27 +162,34 @@ export default {
       this.liquidity = liquidity.data
     },
 
-    async addLiquidity() {
-      this.loading = true
-      const liquidity = await this.$axios.post(
-        `/api/uniswap/${this.selectedWallet}/liquidity`,
-        {
-          token: this.selectedToken,
-          amount: this.amount,
-        }
-      )
-      this.liquidity = liquidity.data
-      this.loading = false
-      this.getLiquidity(this.selectedWallet)
+     handleStoplossChange(value, record) {
+      const { id, owner, token0, token1, depositedToken0, depositedToken1 } =
+        record
+      const liquidity = {
+        id,
+        owner,
+        token0,
+        token1,
+        depositedToken0,
+        depositedToken1,
+        stoploss: value,
+      }
+      return liquidity
     },
 
-    async removeLiquidity(liquidity) {
-      this.loading = true
-      await this.$axios.delete(
-        `/api/uniswap/${this.selectedWallet}/liquidity/${liquidity._id}`
-      )
-      this.loading = false
-      this.getLiquidity(this.selectedWallet)
+    async handleStoplossClick(record) {
+      const { id, owner, token0, token1, depositedToken0, depositedToken1, stoploss } =
+        record
+      const liquidity = {
+        id,
+        owner,
+        token0,
+        token1,
+        depositedToken0,
+        depositedToken1,
+        stoploss,
+      }
+      await this.$axios.put(`/api/uniswap/wallet/${id}`, liquidity)
     },
   },
 }
