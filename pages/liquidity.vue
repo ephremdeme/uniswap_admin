@@ -25,7 +25,7 @@
     </a-form>
     <a-divider />
 
-    <Table :columns="columns" :data="liquidity" />
+    <Table :columns="columns" :data="liquidity" :on-submit="handleSubmit" />
   </div>
 </template>
 
@@ -43,14 +43,14 @@ export default {
 
   async asyncData({ $axios }) {
     const wallets = await $axios.get('/api/accounts')
-    return { wallets: wallets.data, tokens: [], liquidity: [] }
+    return { wallets: wallets.data, liquidity: [] }
   },
 
   data() {
     return {
       form: this.$form.createForm(this),
       wallets: [],
-      tokens: [],
+
       liquidity: [],
       selectedWallet: '',
       selectedToken: '',
@@ -77,6 +77,7 @@ export default {
           dataIndex: 'token0.symbol',
           key: 'symbol0',
           scopedSlots: { customRender: 'tags' },
+          width: 100,
         },
         {
           title: 'Balance0',
@@ -88,6 +89,7 @@ export default {
           dataIndex: 'token1.symbol',
           key: 'symbol1',
           scopedSlots: { customRender: 'tags' },
+          width: 100,
         },
         {
           title: 'Balance1',
@@ -100,28 +102,10 @@ export default {
           key: 'liquidity',
         },
         {
-          title: 'Stoploss',
-          dataIndex: 'stoploss',
-          key: 'stoploss',
-          customRender: (text, record) => (
-            <div>
-              <a-input-number
-                min={0}
-                max={100}
-                defaultValue={0}
-                formatter={(value) => `${value}%`}
-                parser={(value) => value.replace('%', '')}
-                onChange="handleStoplossChange(value, record)"
-              />
-              <button
-                class="ant-btn ant-btn-primary"
-                onChange="handleStoplossClick(record)"
-              >
-                Set
-              </button>
-
-            </div>
-          ),
+          title: 'StopLoss',
+          dataIndex: 'stopLoss',
+          key: 'stopLoss',
+          scopedSlots: { customRender: 'editable' },
         },
       ],
     }
@@ -131,7 +115,6 @@ export default {
     selectedWallet: {
       handler: function (val, oldVal) {
         if (!val || val === oldVal) return
-        this.getTokens(val)
         this.getLiquidity(val)
       },
       immediate: true,
@@ -139,22 +122,8 @@ export default {
   },
 
   methods: {
-    handleSubmit(e) {
-      e.preventDefault()
-      this.form.validateFields((err, values) => {
-        if (!err) {
-          this.addLiquidity()
-        }
-      })
-    },
-
     handleWalletChange(value) {
       this.selectedWallet = value
-    },
-
-    async getTokens(id) {
-      const tokens = await this.$axios.get(`/api/accounts/${id}/tokens`)
-      this.tokens = tokens.data
     },
 
     async getLiquidity(id) {
@@ -162,34 +131,18 @@ export default {
       this.liquidity = liquidity.data
     },
 
-     handleStoplossChange(value, record) {
-      const { id, owner, token0, token1, depositedToken0, depositedToken1 } =
-        record
+    async handleSubmit(record, name, event) {
+      const { id, owner } = record
       const liquidity = {
         id,
         owner,
-        token0,
-        token1,
-        depositedToken0,
-        depositedToken1,
-        stoploss: value,
+        stopLoss: event,
       }
-      return liquidity
-    },
-
-    async handleStoplossClick(record) {
-      const { id, owner, token0, token1, depositedToken0, depositedToken1, stoploss } =
-        record
-      const liquidity = {
-        id,
-        owner,
-        token0,
-        token1,
-        depositedToken0,
-        depositedToken1,
-        stoploss,
-      }
-      await this.$axios.put(`/api/uniswap/wallet/${id}`, liquidity)
+      await this.$axios.put(
+        `/api/uniswap/${this.selectedWallet}/positions/${id}`,
+        liquidity
+      )
+      await this.getLiquidity(this.selectedWallet)
     },
   },
 }
