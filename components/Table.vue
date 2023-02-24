@@ -1,6 +1,12 @@
 <template>
   <div class="table">
-    <a-button v-if="formComponent" class="add-btn" type="primary" @click="showModal">Add</a-button>
+    <a-button
+      v-if="formComponent"
+      class="add-btn"
+      type="primary"
+      @click="showModal"
+      >Add</a-button
+    >
     <a-table
       :columns="columns"
       :data-source="data"
@@ -9,6 +15,12 @@
       :row-key="(record) => record.id"
       bordered
     >
+      <template slot="editable" slot-scope="text, record">
+        <editable-cell
+          :text="text"
+          @change="onSubmit(record, 'editable', $event)"
+        />
+      </template>
       <span slot="tags" slot-scope="tag">
         <a-tag :color="'green'">
           {{ tag.toUpperCase() }}
@@ -16,8 +28,12 @@
       </span>
 
       <template slot="action" slot-scope="text, record">
-        <a-button v-if="allowEdit" type="primary" @click="onEdit(record)">Edit</a-button>
-        <a-button v-if="allowDelete" type="danger" @click="onDelete(record)">Delete</a-button>
+        <a-button v-if="allowEdit" type="primary" @click="onEdit(record)"
+          >Edit</a-button
+        >
+        <a-button v-if="allowDelete" type="danger" @click="onDelete(record)"
+          >Delete</a-button
+        >
       </template>
     </a-table>
     <a-modal
@@ -42,6 +58,7 @@ export default {
   name: 'NuxtTable',
   components: {
     'a-modal': Modal,
+    EditableCell: () => import('./EditableCell.vue'),
   },
   props: {
     columns: {
