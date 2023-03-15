@@ -12,7 +12,7 @@
       :data-source="data"
       :pagination="false"
       :scroll="{ x: 1300 }"
-      :row-key="(record) => record.id"
+      :row-key="(record) => record._id"
       bordered
     >
       <template slot="editable" slot-scope="text, record">
