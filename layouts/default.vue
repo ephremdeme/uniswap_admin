@@ -7,7 +7,11 @@
       @breakpoint="onBreakpoint"
     >
       <div class="logo" />
-      <a-menu theme="dark" mode="inline" :default-selected-keys="['4']">
+      <a-menu
+        theme="dark"
+        mode="inline"
+        :default-selected-keys="[activeNavKey]"
+      >
         <a-menu-item key="1">
           <NuxtLink to="/wallets">
             <a-icon type="wallet" />
@@ -32,7 +36,7 @@
             <span class="nav-text">Swap</span>
           </NuxtLink>
         </a-menu-item>
-        
+
         <!-- Logout -->
         <a-menu-item key="6" @click="onLogout">
           <a-icon type="logout" />
@@ -56,7 +60,19 @@
   </a-layout>
 </template>
 <script lang="js">
+const NavKeys = {
+  WALLET: "1",
+  TOKENS: "2",
+  LIQUIDITY: "3",
+  SWAP: "4",
+  LOGOUT: "6",
+};
 export default {
+  computed: {
+    activeNavKey() {
+      return NavKeys[this.$route.name.toUpperCase()];
+    },
+  },
   methods: {
     onCollapse(collapsed, type) {
     },
@@ -66,9 +82,8 @@ export default {
       this.$auth.logout().then(() => {
         this.$router.push("/login");
       })
-      // go to login page
     },
-  },
+  }
 };
 </script>
 
