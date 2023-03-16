@@ -25,20 +25,26 @@
     </a-form>
     <a-divider />
 
-    <Table :columns="columns" :data="liquidity" :on-submit="handleSubmit" />
+    <Table
+      :columns="columns"
+      :data="liquidity"
+      :on-submit="handleSubmit"
+      :allow-delete="false"
+      :form-component="EditLiquidity"
+      :loading="loading"
+    />
   </div>
 </template>
 
 <script>
-import { Form, Select, InputNumber } from 'ant-design-vue'
+import { Form, Select } from 'ant-design-vue'
+import EditLiquidity from '../components/liquidity/EditLiquidity.vue'
 
 export default {
   name: 'NuxtLiquidity',
   components: {
     'a-form': Form,
     'a-select': Select,
-    // eslint-disable-next-line vue/no-unused-components
-    'a-input-number': InputNumber,
   },
 
   async asyncData({ $axios }) {
@@ -68,14 +74,9 @@ export default {
           key: 'ids',
         },
         {
-          title: 'Address',
-          dataIndex: 'owner',
-          key: 'owner',
-        },
-        {
-          title: 'Symbol0',
-          dataIndex: 'token0.symbol',
-          key: 'symbol0',
+          title: 'Pair',
+          dataIndex: 'pair',
+          key: 'pair',
           scopedSlots: { customRender: 'tags' },
           width: 100,
         },
@@ -85,29 +86,49 @@ export default {
           key: 'balance0',
         },
         {
-          title: 'Symbol1',
-          dataIndex: 'token1.symbol',
-          key: 'symbol1',
-          scopedSlots: { customRender: 'tags' },
-          width: 100,
-        },
-        {
           title: 'Balance1',
           dataIndex: 'balance1',
           key: 'balance1',
         },
         {
-          title: 'Liquidty',
-          dataIndex: 'liquidity',
-          key: 'liquidity',
+          title: "Coll Fees0",
+          dataIndex: 'collectedFeesToken0',
+          key: 'collectedFeesToken0',
         },
         {
-          title: 'StopLoss',
-          dataIndex: 'stopLoss',
-          key: 'stopLoss',
-          scopedSlots: { customRender: 'editable' },
+          title: "Coll Fees1",
+          dataIndex: 'collectedFeesToken1',
+          key: 'collectedFeesToken1',
+        },
+        {
+          title: 'StopLow',
+          dataIndex: 'stopLow',
+          key: 'stopLow',
+        },
+        {
+          title: 'StopHigh',
+          dataIndex: 'stopHigh',
+          key: 'stopHigh',
+        },
+        {
+          title: 'Slippage',
+          dataIndex: 'slippage',
+          key: 'slippage',
+        },
+        {
+          title: 'Token',
+          dataIndex: 'token.symbol',
+          key: 'token',
+          scopedSlots: { customRender: 'tags' },
+          width: 100,
+        },
+        {
+          title: 'Edit',
+          key: 'edit',
+          scopedSlots: { customRender: 'action' },
         },
       ],
+      EditLiquidity,
     }
   },
 
@@ -127,22 +148,41 @@ export default {
     },
 
     async getLiquidity(id) {
+      this.loading = true
       const liquidity = await this.$axios.get(`/api/uniswap/${id}/positions`)
-      this.liquidity = liquidity.data
+      this.liquidity = liquidity.data.map((l) => {
+        return {
+          ...l,
+          key: l.id,
+          pair: `${l.token0.symbol}-${l.token1.symbol}`,
+        }
+      })
+      this.loading = false
     },
 
-    async handleSubmit(record, name, event) {
-      const { id, owner } = record
-      const liquidity = {
-        id,
-        owner,
-        stopLoss: event,
+    async handleSubmit(values) {
+      this.loading = true
+      try {
+        
+        const { id, stopHigh, stopLow, slippage, token } = values
+  
+        const liquidity = {
+          id,
+          stopHigh,
+          stopLow,
+          slippage,
+          token
+        }
+        await this.$axios.put(
+          `/api/uniswap/${this.selectedWallet}/positions/${id}`,
+          liquidity
+        )
+        await this.getLiquidity(this.selectedWallet)
+      } catch (error) {
+        this.$message.error(error.message)
+      } finally {
+        this.loading = false
       }
-      await this.$axios.put(
-        `/api/uniswap/${this.selectedWallet}/positions/${id}`,
-        liquidity
-      )
-      await this.getLiquidity(this.selectedWallet)
     },
   },
 }
