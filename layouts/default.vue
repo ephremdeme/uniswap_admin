@@ -61,7 +61,7 @@
 </template>
 <script lang="js">
 const NavKeys = {
-  WALLET: "1",
+  WALLETS: "1",
   TOKENS: "2",
   LIQUIDITY: "3",
   SWAP: "4",
@@ -70,7 +70,7 @@ const NavKeys = {
 export default {
   computed: {
     activeNavKey() {
-      return NavKeys[this.$route.name.toUpperCase()];
+      return NavKeys[this.$route.name.toUpperCase().split('-')[0]];
     },
   },
   methods: {
