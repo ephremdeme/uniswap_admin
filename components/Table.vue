@@ -14,6 +14,7 @@
       :pagination="false"
       :scroll="{ x: 1300 }"
       :row-key="(record) => record._id"
+      :loading="loading"
       bordered
     >
       <template slot="editable" slot-scope="text, record">
@@ -89,6 +90,10 @@ export default {
     allowDelete: {
       type: Boolean,
       default: true,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
