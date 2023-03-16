@@ -8,6 +8,7 @@
       >Add</a-button
     >
     <a-table
+      :key="'_id'"
       :columns="columns"
       :data-source="data"
       :pagination="false"
@@ -17,7 +18,7 @@
     >
       <template slot="editable" slot-scope="text, record">
         <editable-cell
-          :text="text"
+          :text="String(text)"
           @change="onSubmit(record, 'editable', $event)"
         />
       </template>
