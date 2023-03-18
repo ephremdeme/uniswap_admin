@@ -91,12 +91,12 @@ export default {
           key: 'balance1',
         },
         {
-          title: "Coll Fees0",
+          title: 'Coll Fees0',
           dataIndex: 'collectedFeesToken0',
           key: 'collectedFeesToken0',
         },
         {
-          title: "Coll Fees1",
+          title: 'Coll Fees1',
           dataIndex: 'collectedFeesToken1',
           key: 'collectedFeesToken1',
         },
@@ -149,7 +149,12 @@ export default {
 
     async getLiquidity(id) {
       this.loading = true
-      const liquidity = await this.$axios.get(`/api/uniswap/${id}/positions`)
+      const liquidity = await this.$axios
+        .get(`/api/uniswap/${id}/positions`)
+        .catch((e) => {
+          this.$message.error(e.message)
+          return { data: [] }
+        })
       this.liquidity = liquidity.data.map((l) => {
         return {
           ...l,
@@ -163,15 +168,14 @@ export default {
     async handleSubmit(values) {
       this.loading = true
       try {
-        
         const { id, stopHigh, stopLow, slippage, token } = values
-  
+
         const liquidity = {
           id,
           stopHigh,
           stopLow,
           slippage,
-          token
+          token,
         }
         await this.$axios.put(
           `/api/uniswap/${this.selectedWallet}/positions/${id}`,

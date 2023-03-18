@@ -25,7 +25,7 @@
       </template>
       <span slot="tags" slot-scope="tag">
         <a-tag :color="'green'">
-          {{ tag.toUpperCase() }}
+          {{ tag?.toUpperCase() }}
         </a-tag>
       </span>
 
