@@ -78,7 +78,7 @@ export default {
           dataIndex: 'pair',
           key: 'pair',
           scopedSlots: { customRender: 'tags' },
-          width: 100,
+          width: 140,
         },
         {
           title: 'Balance0',
