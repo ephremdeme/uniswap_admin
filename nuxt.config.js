@@ -56,7 +56,7 @@ export default {
     },
   },
   axios: {
-    baseURL: 'https://uniswapsample-production.up.railway.app',
+    baseURL: 'https://uniswap.ephrem.dev/uniswap',
     // baseURL: 'localhost:5005',
   },
 }
