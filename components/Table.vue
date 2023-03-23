@@ -13,7 +13,7 @@
       :data-source="data"
       :pagination="false"
       :scroll="{ x: 1300 }"
-      :row-key="(record) => record._id"
+      :row-key="(record) => record._id || record.id"
       :loading="loading"
       bordered
     >

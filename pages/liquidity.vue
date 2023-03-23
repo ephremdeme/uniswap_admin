@@ -12,13 +12,26 @@
       :wrapper-col="wrapperCol"
     >
       <a-form-item label="Wallet">
-        <a-select placeholder="Select a wallet" @change="handleWalletChange">
+        <a-select
+          v-decorator="[
+            'wallet',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please select a wallet',
+                },
+              ],
+            },
+          ]"
+          placeholder="Select a wallet"
+        >
           <a-select-option
-            v-for="wallet in wallets"
-            :key="wallet._id"
-            :value="wallet._id"
+            v-for="wal in wallets"
+            :key="wal._id"
+            :value="wal._id"
           >
-            {{ wallet.name }}
+            {{ wal.name }}
           </a-select-option>
         </a-select>
       </a-form-item>
@@ -58,7 +71,7 @@ export default {
       wallets: [],
 
       liquidity: [],
-      selectedWallet: '',
+      wallet: '',
       selectedToken: '',
       amount: 0,
 
@@ -132,19 +145,24 @@ export default {
     }
   },
 
-  watch: {
-    selectedWallet: {
-      handler: function (val, oldVal) {
-        if (!val || val === oldVal) return
-        this.getLiquidity(val)
-      },
-      immediate: true,
-    },
+  mounted() {
+    this.form.setFieldsValue({
+      wallet: this.wallets[0]?._id,
+    })
+
+    if (this.wallets[0]) {
+      this.getLiquidity(this.wallets[0]._id)
+      this.wallet = this.wallets[0]._id
+    }
   },
 
   methods: {
     handleWalletChange(value) {
-      this.selectedWallet = value
+      if (!value) return
+
+      if (this.wallet === value) return
+      this.wallet = value
+      this.getLiquidity(value)
     },
 
     async getLiquidity(id) {
@@ -178,10 +196,10 @@ export default {
           token,
         }
         await this.$axios.put(
-          `/api/uniswap/${this.selectedWallet}/positions/${id}`,
+          `/api/uniswap/${this.wallet}/positions/${id}`,
           liquidity
         )
-        await this.getLiquidity(this.selectedWallet)
+        await this.getLiquidity(this.wallet)
       } catch (error) {
         this.$message.error(error.message)
       } finally {
