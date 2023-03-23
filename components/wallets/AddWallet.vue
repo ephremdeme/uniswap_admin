@@ -11,7 +11,17 @@
           ]"
         />
       </a-form-item>
-
+      <!-- conditionally display on create not edit -->
+      <a-form-item v-if="!formData.name" label="Private Key">
+        <a-input
+          v-decorator="[
+            'privateKey',
+            {
+              rules: [{ required: true, message: 'Please input private key!' }],
+            },
+          ]"
+        />
+      </a-form-item>
       <a-form-item>
         <a-button type="primary" html-type="submit" :loading="loading">
           Submit
