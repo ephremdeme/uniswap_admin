@@ -67,9 +67,16 @@
             ],
           },
         ]"
-        :placeholder="placeholder"
-        :options="tokens"
-      />
+        placeholder="Select a wallet"
+      >
+        <a-select-option
+          v-for="token in tokens"
+          :key="token.value"
+          :value="token.value"
+        >
+          {{ token.label }}
+        </a-select-option>
+      </a-select>
     </a-form-item>
     <a-form-item>
       <a-button type="primary" html-type="submit" :loading="loading">
@@ -118,19 +125,59 @@ export default {
       tokens: [],
     }
   },
+
+  watch: {
+    formData: {
+      handler: function (val, oldVal) {
+        if (val && val.token0 && oldVal && val._id !== oldVal._id) {
+          this.tokens = [
+            {
+              label: val.token0.symbol,
+              value: val.token0.id.toUpperCase(),
+            },
+            {
+              label: val.token1.symbol,
+              value: val.token1.id.toUpperCase(),
+            },
+          ]
+          this.form.setFieldsValue({
+            token: val.token?.address.toUpperCase(),
+            stopLow: val.stopLow,
+            stopHigh: val.stopHigh,
+            slippage: val.slippage,
+          })
+        }
+        if (!val || !val.token) {
+          this.form.resetFields()
+        }
+
+        return val
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
+
   mounted() {
-    this.form.setFieldsValue(this.formData)
     this.tokens = [
       {
-        label: this.formData.token0.symbol,
-        value: this.formData.token0.id,
+        label: this.formData?.token0.symbol,
+        value: this.formData?.token0.id.toUpperCase(),
       },
       {
-        label: this.formData.token1.symbol,
-        value: this.formData.token1.id,
+        label: this.formData?.token1.symbol,
+        value: this.formData?.token1.id.toUpperCase(),
       },
     ]
+
+    this.form.setFieldsValue({
+      token: this.formData?.token.address.toUpperCase(),
+      stopLow: this.formData?.stopLow,
+      stopHigh: this.formData?.stopHigh,
+      slippage: this.formData?.slippage,
+    })
   },
+
   unmounted() {
     this.resetForm()
   },
@@ -138,7 +185,6 @@ export default {
     handleSubmit(e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
-        console.log('Values: ', values)
         if (!err) {
           this.loading = true
           this.onSubmit({
