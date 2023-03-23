@@ -25,6 +25,7 @@
             },
           ]"
           placeholder="Select a wallet"
+          @change="handleWalletChange"
         >
           <a-select-option
             v-for="wal in wallets"
@@ -91,50 +92,76 @@ export default {
           dataIndex: 'pair',
           key: 'pair',
           scopedSlots: { customRender: 'tags' },
-          width: 140,
+          width: 130,
+        },
+        {
+          title: 'Price',
+          dataIndex: 'currentPrice',
+          key: 'currentPrice',
+          width: 100,
+        },
+        {
+          title: 'Deposited0',
+          dataIndex: 'depositedToken0',
+          key: 'depositedToken0',
+          width: 130,
+        },
+        {
+          title: 'Deposited1',
+          dataIndex: 'depositedToken1',
+          key: 'depositedToken1',
+          width: 130,
         },
         {
           title: 'Balance0',
           dataIndex: 'balance0',
           key: 'balance0',
+          width: 130
         },
         {
           title: 'Balance1',
           dataIndex: 'balance1',
           key: 'balance1',
+          width: 130
         },
         {
-          title: 'Coll Fees0',
+          title: 'Fees0',
           dataIndex: 'collectedFeesToken0',
           key: 'collectedFeesToken0',
+          width: 110
         },
         {
-          title: 'Coll Fees1',
+          title: 'Fees1',
           dataIndex: 'collectedFeesToken1',
           key: 'collectedFeesToken1',
+          width: 110
         },
         {
           title: 'StopLow',
           dataIndex: 'stopLow',
           key: 'stopLow',
+          width: 90
         },
         {
           title: 'StopHigh',
           dataIndex: 'stopHigh',
           key: 'stopHigh',
+          width: 95
         },
         {
           title: 'Slippage',
           dataIndex: 'slippage',
           key: 'slippage',
+          width: 90
         },
         {
           title: 'Token',
           dataIndex: 'token.symbol',
           key: 'token',
           scopedSlots: { customRender: 'tags' },
-          width: 100,
+          width: 80,
         },
+        
         {
           title: 'Edit',
           key: 'edit',
