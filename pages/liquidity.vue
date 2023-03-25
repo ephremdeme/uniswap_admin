@@ -43,9 +43,12 @@
       :columns="columns"
       :data="liquidity"
       :on-submit="handleSubmit"
-      :allow-delete="false"
+      :allow-delete="true"
       :form-component="EditLiquidity"
       :loading="loading"
+      :allow-remove="true"
+      :on-remove="handleRemove"
+      :on-delete="handleDelete"
     />
   </div>
 </template>
@@ -86,6 +89,7 @@ export default {
           title: 'ID',
           dataIndex: 'id',
           key: 'ids',
+          width: 90,
         },
         {
           title: 'Pair',
@@ -116,43 +120,43 @@ export default {
           title: 'Balance0',
           dataIndex: 'balance0',
           key: 'balance0',
-          width: 130
+          width: 130,
         },
         {
           title: 'Balance1',
           dataIndex: 'balance1',
           key: 'balance1',
-          width: 130
+          width: 130,
         },
         {
           title: 'Fees0',
           dataIndex: 'collectedFeesToken0',
           key: 'collectedFeesToken0',
-          width: 110
+          width: 110,
         },
         {
           title: 'Fees1',
           dataIndex: 'collectedFeesToken1',
           key: 'collectedFeesToken1',
-          width: 110
+          width: 110,
         },
         {
           title: 'StopLow',
           dataIndex: 'stopLow',
           key: 'stopLow',
-          width: 90
+          width: 90,
         },
         {
           title: 'StopHigh',
           dataIndex: 'stopHigh',
           key: 'stopHigh',
-          width: 95
+          width: 95,
         },
         {
           title: 'Slippage',
           dataIndex: 'slippage',
           key: 'slippage',
-          width: 90
+          width: 90,
         },
         {
           title: 'Token',
@@ -161,11 +165,12 @@ export default {
           scopedSlots: { customRender: 'tags' },
           width: 80,
         },
-        
+
         {
           title: 'Edit',
           key: 'edit',
           scopedSlots: { customRender: 'action' },
+          width: 320,
         },
       ],
       EditLiquidity,
@@ -232,6 +237,39 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+
+    handleDelete(pos) {
+      this.loading = true
+      this.$axios
+        .delete(`/api/uniswap/${this.wallet}/positions/${pos.id}`)
+        .then(() => {
+          this.getLiquidity(this.wallet)
+        })
+        .catch((e) => {
+          this.$message.error(e.message)
+        })
+        .finally(() => {
+          this.loading = false
+        })
+    },
+
+    handleRemove(pos) {
+      this.loading = true
+      this.$axios
+        .post(`/api/uniswap/${this.wallet}/positions/${pos.id}/swap`, {
+          slippage: pos.slippage,
+          token: pos.token?.address || pos.token,
+        })
+        .then(() => {
+          this.getLiquidity(this.wallet)
+        })
+        .catch((e) => {
+          this.$message.error(e.message)
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
   },
 }
