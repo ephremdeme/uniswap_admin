@@ -36,6 +36,14 @@
         <a-button v-if="allowDelete" type="danger" @click="onDelete(record)"
           >Delete</a-button
         >
+
+        <a-button
+          v-if="allowRemove"
+          type="danger"
+          :disabled="!record.slippage"
+          @click="onRemove(record)"
+          >Remove & Swap</a-button
+        >
       </template>
     </a-table>
     <a-modal
@@ -79,6 +87,10 @@ export default {
       type: Function,
       default: () => {},
     },
+    onRemove: {
+      type: Function,
+      default: () => {},
+    },
     formComponent: {
       type: Object,
       default: () => {},
@@ -90,6 +102,10 @@ export default {
     allowDelete: {
       type: Boolean,
       default: true,
+    },
+    allowRemove: {
+      type: Boolean,
+      default: false,
     },
     loading: {
       type: Boolean,
