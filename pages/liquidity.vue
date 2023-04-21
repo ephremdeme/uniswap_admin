@@ -159,13 +159,19 @@ export default {
           width: 90,
         },
         {
-          title: 'Token',
-          dataIndex: 'token.symbol',
+          title: 'TokenLow',
+          dataIndex: 'tokenLow.symbol',
           key: 'token',
           scopedSlots: { customRender: 'tags' },
           width: 80,
         },
-
+        {
+          title: 'TokenHigh',
+          dataIndex: 'tokenHigh.symbol',
+          key: 'token',
+          scopedSlots: { customRender: 'tags' },
+          width: 80,
+        },
         {
           title: 'Edit',
           key: 'edit',
@@ -218,18 +224,9 @@ export default {
     async handleSubmit(values) {
       this.loading = true
       try {
-        const { id, stopHigh, stopLow, slippage, token } = values
-
-        const liquidity = {
-          id,
-          stopHigh,
-          stopLow,
-          slippage,
-          token,
-        }
         await this.$axios.put(
-          `/api/uniswap/${this.wallet}/positions/${id}`,
-          liquidity
+          `/api/uniswap/${this.wallet}/positions/${values.id}`,
+          values
         )
         await this.getLiquidity(this.wallet)
       } catch (error) {

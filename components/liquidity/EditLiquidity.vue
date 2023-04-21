@@ -1,39 +1,99 @@
 <template>
   <a-form :form="form" :layout="layout" @submit="handleSubmit">
-    <a-form-item label="Stop Low">
-      <a-input-number
-        v-decorator="[
-          'stopLow',
-          {
-            rules: [
+    <a-row>
+      <a-col :span="10">
+        <a-form-item label="Stop Low">
+          <a-input-number
+            v-decorator="[
+              'stopLow',
               {
-                required: true,
-                message: 'Please input a stop low value',
+                rules: [
+                  {
+                    required: true,
+                    message: 'Please input a stop low value',
+                  },
+                ],
               },
-            ],
-          },
-        ]"
-        :min="0"
-        :step="10"
-      />
-    </a-form-item>
-    <a-form-item label="Stop High">
-      <a-input-number
-        v-decorator="[
-          'stopHigh',
-          {
-            rules: [
+            ]"
+            :min="0"
+            :step="10"
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="13">
+        <a-form-item label="Token">
+          <a-select
+            v-decorator="[
+              'tokenLow',
               {
-                required: true,
-                message: 'Please input a stop high value',
+                rules: [
+                  {
+                    required: true,
+                    message: 'Please select a token',
+                  },
+                ],
               },
-            ],
-          },
-        ]"
-        :min="0"
-        :step="10"
-      />
-    </a-form-item>
+            ]"
+            placeholder="Select a wallet"
+          >
+            <a-select-option
+              v-for="token in tokens"
+              :key="token.value"
+              :value="token.value"
+            >
+              {{ token.label }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+      </a-col>
+    </a-row>
+    <a-row>
+      <a-col :span="10">
+        <a-form-item label="Stop High">
+          <a-input-number
+            v-decorator="[
+              'stopHigh',
+              {
+                rules: [
+                  {
+                    required: true,
+                    message: 'Please input a stop high value',
+                  },
+                ],
+              },
+            ]"
+            :min="0"
+            :step="10"
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="13">
+        <a-form-item label="Token">
+          <a-select
+            v-decorator="[
+              'tokenHigh',
+              {
+                rules: [
+                  {
+                    required: true,
+                    message: 'Please select a token',
+                  },
+                ],
+              },
+            ]"
+            placeholder="Select a wallet"
+          >
+            <a-select-option
+              v-for="token in tokens"
+              :key="token.value"
+              :value="token.value"
+            >
+              {{ token.label }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+      </a-col>
+    </a-row>
     <a-form-item label="Slippage">
       <a-input-number
         v-decorator="[
@@ -53,30 +113,6 @@
         :formatter="(value) => `${value}%`"
         :parser="(value) => value.replace('%', '')"
       />
-    </a-form-item>
-    <a-form-item label="Token">
-      <a-select
-        v-decorator="[
-          'token',
-          {
-            rules: [
-              {
-                required: true,
-                message: 'Please select a token',
-              },
-            ],
-          },
-        ]"
-        placeholder="Select a wallet"
-      >
-        <a-select-option
-          v-for="token in tokens"
-          :key="token.value"
-          :value="token.value"
-        >
-          {{ token.label }}
-        </a-select-option>
-      </a-select>
     </a-form-item>
     <a-form-item>
       <a-button type="primary" html-type="submit" :loading="loading">
@@ -141,13 +177,14 @@ export default {
             },
           ]
           this.form.setFieldsValue({
-            token: val.token?.address.toUpperCase(),
+            tokenLow: val.tokenLow?.address.toUpperCase(),
+            tokenHigh: val.tokenHigh?.address.toUpperCase(),
             stopLow: val.stopLow,
             stopHigh: val.stopHigh,
             slippage: val.slippage,
           })
         }
-        if (!val || !val.token) {
+        if (!val || !val.tokenLow || !val.tokenHigh) {
           this.form.resetFields()
         }
 
@@ -171,7 +208,8 @@ export default {
     ]
 
     this.form.setFieldsValue({
-      token: this.formData?.token.address.toUpperCase(),
+      tokenLow: this.formData?.tokenLow?.address.toUpperCase(),
+      tokenHigh: this.formData?.tokenHigh?.address.toUpperCase(),
       stopLow: this.formData?.stopLow,
       stopHigh: this.formData?.stopHigh,
       slippage: this.formData?.slippage,
