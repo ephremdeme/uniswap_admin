@@ -2,6 +2,46 @@
   <a-form :form="form" :layout="layout" @submit="handleSubmit">
     <a-row>
       <a-col :span="10">
+        <a-form-item label="Deposited0">
+          <a-input-number
+            v-decorator="[
+              'depositedToken0',
+              {
+                rules: [
+                  {
+                    required: true,
+                    message: 'Please input a stop low value',
+                  },
+                ],
+              },
+            ]"
+            :min="0"
+            :step="10"
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="12">
+        <a-form-item label="Deposited1">
+          <a-input-number
+            v-decorator="[
+              'depositedToken1',
+              {
+                rules: [
+                  {
+                    required: true,
+                    message: 'Please input a stop low value',
+                  },
+                ],
+              },
+            ]"
+            :min="0"
+            :step="10"
+          />
+        </a-form-item>
+      </a-col>
+    </a-row>
+    <a-row>
+      <a-col :span="10">
         <a-form-item label="Stop Low">
           <a-input-number
             v-decorator="[
@@ -182,6 +222,8 @@ export default {
             stopLow: val.stopLow,
             stopHigh: val.stopHigh,
             slippage: val.slippage,
+            depositedToken0: val.depositedToken0,
+            depositedToken1: val.depositedToken1,
           })
         }
         if (!val || !val.tokenLow || !val.tokenHigh) {
@@ -213,6 +255,8 @@ export default {
       stopLow: this.formData?.stopLow,
       stopHigh: this.formData?.stopHigh,
       slippage: this.formData?.slippage,
+      depositedToken0: this.formData?.depositedToken0,
+      depositedToken1: this.formData?.depositedToken1,
     })
   },
 
