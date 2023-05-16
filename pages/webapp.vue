@@ -6,7 +6,7 @@
   <div>
     <div>Telegram</div>
     <a-row>
-      <a-col :span="10">
+      <a-col :span="20">
         <EditLiquidity />
       </a-col>
     </a-row>
