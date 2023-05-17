@@ -7,7 +7,7 @@
     <div>Telegram</div>
     <a-row>
       <a-col :span="20">
-        <EditLiquidity />
+        <EditLiquidity :on-submit="submitForm" :form-data="formData" />
       </a-col>
     </a-row>
   </div>
@@ -28,10 +28,20 @@ export default {
 
   data() {
     return {
-      data: {
-        telegram_username: 'test',
-      },
+      formData: null,
+      telegramQuery: null,
     }
+  },
+
+  watch: {
+    telegramQuery: {
+      handler: function (val, oldVal) {
+        if (val && oldVal && val.url !== oldVal.url) {
+          console.log('telegramQuery', val, oldVal)
+          this.telegramQuery = val
+        }
+      },
+    },
   },
 
   beforeMount() {
@@ -45,6 +55,36 @@ export default {
 
   mounted() {
     console.log('Route => ', this.$route)
+    this.telegramQuery = this.$route.query
+    if (this.telegramQuery) {
+      this.getLiquidity()
+    }
+  },
+  methods: {
+    // eslint-disable-next-line require-await
+    async submitForm(values) {
+      try {
+        console.log(this.telegramQuery, 'submitForm => ', values)
+        // await this.$axios.$post('/api/telegram', this.data)
+        this.$message.success('Telegram username saved')
+      } catch (err) {
+        this.$message.error(err.message)
+      }
+    },
+
+    async getLiquidity() {
+      try {
+        const liquidity = await this.$axios.$get(this.telegramQuery.url, {
+          headers: {
+            'Content-Type': 'application/json',
+            authorization: 'Bearer ' + this.telegramQuery.token,
+          },
+        })
+        this.liquidity = liquidity.data
+      } catch (err) {
+        this.$message.error(err.message)
+      }
+    },
   },
 }
 </script>
