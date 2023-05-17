@@ -55,7 +55,7 @@
 
 <script>
 import { Form, Select } from 'ant-design-vue'
-import EditLiquidity from '../components/liquidity/EditLiquidity.vue'
+import EditLiquidity from '../../components/liquidity/EditLiquidity.vue'
 
 export default {
   name: 'NuxtLiquidity',
