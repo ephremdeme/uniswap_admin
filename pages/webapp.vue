@@ -70,7 +70,7 @@ export default {
         const liquidity = await this.$axios.$get(this.telegramQuery.url, {
           headers: {
             'Content-Type': 'application/json',
-            authorization: 'Bearer ' + this.telegramQuery.token,
+            Authorization: 'Bearer ' + this.telegramQuery.token,
           },
         })
         this.formData = liquidity
