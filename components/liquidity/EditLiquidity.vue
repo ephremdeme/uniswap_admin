@@ -205,7 +205,7 @@ export default {
   watch: {
     formData: {
       handler: function (val, oldVal) {
-        if (val && val.token0 && oldVal && val._id !== oldVal._id) {
+        if (val && val.token0 && oldVal !== val) {
           this.tokens = [
             {
               label: val.token0.symbol,

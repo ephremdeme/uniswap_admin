@@ -1,7 +1,3 @@
-<!-- 
-   Display telegram button, if user is logged in and has telegram username
-
- -->
 <template>
   <div>
     <div>Telegram</div>
@@ -21,11 +17,6 @@ export default {
     EditLiquidity,
   },
   layout: 'bot',
-  setup() {
-    // eslint-disable-next-line no-console
-    console.log('Setup Telegram Web App')
-  },
-
   data() {
     return {
       formData: null,
@@ -37,7 +28,6 @@ export default {
     telegramQuery: {
       handler: function (val, oldVal) {
         if (val && oldVal && val.url !== oldVal.url) {
-          console.log('telegramQuery', val, oldVal)
           this.telegramQuery = val
         }
       },
@@ -54,7 +44,6 @@ export default {
   },
 
   mounted() {
-    console.log('Route => ', this.$route)
     this.telegramQuery = this.$route.query
     if (this.telegramQuery) {
       this.getLiquidity()
@@ -64,9 +53,13 @@ export default {
     // eslint-disable-next-line require-await
     async submitForm(values) {
       try {
-        console.log(this.telegramQuery, 'submitForm => ', values)
-        // await this.$axios.$post('/api/telegram', this.data)
-        this.$message.success('Telegram username saved')
+        await this.$axios.$put(this.telegramQuery.url, values, {
+          headers: {
+            'Content-Type': 'application/json',
+            authorization: 'Bearer ' + this.telegramQuery.token,
+          },
+        })
+        this.$message.success('Position updated successfully')
       } catch (err) {
         this.$message.error(err.message)
       }
@@ -80,8 +73,8 @@ export default {
             authorization: 'Bearer ' + this.telegramQuery.token,
           },
         })
-        this.liquidity = liquidity.data
-      } catch (err) {
+        this.formData = liquidity
+     } catch (err) {
         this.$message.error(err.message)
       }
     },
