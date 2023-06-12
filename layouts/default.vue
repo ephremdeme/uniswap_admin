@@ -6,7 +6,11 @@
       @collapse="onCollapse"
       @breakpoint="onBreakpoint"
     >
-      <div class="logo" />
+      <div class="logo">
+        <NuxtLink to="/">
+          <img src="/logo.png" alt="logo" class="logo" />
+        </NuxtLink>
+      </div>
       <a-menu
         theme="dark"
         mode="inline"
@@ -66,6 +70,7 @@ const NavKeys = {
   LIQUIDITY: "3",
   SWAP: "4",
   LOGOUT: "6",
+  INDEX: "2"
 };
 export default {
   computed: {
