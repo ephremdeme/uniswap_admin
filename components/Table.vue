@@ -1,7 +1,7 @@
 <template>
   <div class="table">
     <a-button
-      v-if="formComponent"
+      v-if="allowAddBtn"
       class="add-btn"
       type="primary"
       @click="showModal"
@@ -107,6 +107,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    allowAdd: {
+      type: Boolean,
+      default: true,
+    },
     loading: {
       type: Boolean,
       default: false,
@@ -119,6 +123,11 @@ export default {
       confirmLoading: false,
       formData: {},
     }
+  },
+  computed: {
+    allowAddBtn() {
+      return this.allowAdd && this.formComponent
+    },
   },
   methods: {
     showModal() {
