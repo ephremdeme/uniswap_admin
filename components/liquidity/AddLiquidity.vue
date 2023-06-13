@@ -2,10 +2,10 @@
   <a-form :form="form" :layout="layout" @submit="handleSubmit">
     <a-row>
       <a-col :span="10">
-        <a-form-item label="Amount0">
+        <a-form-item label="Token 0 Amount">
           <a-input-number
             v-decorator="[
-              'tokenAmount0',
+              'token0Amount',
               {
                 rules: [
                   {
@@ -21,10 +21,10 @@
         </a-form-item>
       </a-col>
       <a-col :span="12">
-        <a-form-item label="Amount1">
+        <a-form-item label="Token 1 Amount">
           <a-input-number
             v-decorator="[
-              'tokenAmount1',
+              'token1Amount',
               {
                 rules: [
                   {
@@ -108,10 +108,10 @@
         </a-form-item>
       </a-col>
       <a-col :span="13">
-        <a-form-item label="Token">
+        <a-form-item label="Token1">
           <a-select
             v-decorator="[
-              'tokenHigh',
+              'token1',
               {
                 rules: [
                   {
@@ -159,11 +159,24 @@
       </a-col>
       <a-col :span="13">
         <a-form-item label="Fee">
-          <a-radio-group v-model="value" @change="onChange">
-            <a-radio :value="1"> A </a-radio>
-            <a-radio :value="2"> B </a-radio>
-            <a-radio :value="3"> C </a-radio>
-            <a-radio :value="4"> D </a-radio>
+          <a-radio-group
+            v-decorator="[
+              'fee',
+              {
+                rules: [
+                  {
+                    required: true,
+                    message: 'Please input a slippage value',
+                  },
+                ],
+              },
+            ]"
+            name="fee"
+            :default-value="0.3"
+          >
+            <a-radio :value="0.05"> 0.05% </a-radio>
+            <a-radio :value="0.3"> 0.3% </a-radio>
+            <a-radio :value="1"> 1% </a-radio>
           </a-radio-group>
         </a-form-item>
       </a-col>
@@ -186,16 +199,18 @@
 </template>
 
 <script>
-import { Form, Select, InputNumber, Button } from 'ant-design-vue'
+import { Form, Select, InputNumber, Button, Radio } from 'ant-design-vue'
 
 export default {
-  name: 'NuxtEditLiquidity',
+  name: 'NuxtAddLiquidity',
   components: {
     'a-form': Form,
     'a-form-item': Form.Item,
     'a-input-number': InputNumber,
     'a-select': Select,
     'a-button': Button,
+    'a-radio': Radio,
+    'a-radio-group': Radio.Group,
   },
   props: {
     onSubmit: {
@@ -253,26 +268,10 @@ export default {
   },
 
   mounted() {
-    this.tokens = [
-      {
-        label: this.formData?.token0.symbol,
-        value: this.formData?.token0.id.toUpperCase(),
-      },
-      {
-        label: this.formData?.token1.symbol,
-        value: this.formData?.token1.id.toUpperCase(),
-      },
-    ]
-
-    this.form.setFieldsValue({
-      tokenLow: this.formData?.tokenLow?.address.toUpperCase(),
-      tokenHigh: this.formData?.tokenHigh?.address.toUpperCase(),
-      stopLow: this.formData?.stopLow,
-      stopHigh: this.formData?.stopHigh,
-      slippage: this.formData?.slippage,
-      token0: this.formData?.token0,
-      depositedToken1: this.formData?.depositedToken1,
-    })
+    this.tokens = this.formData.tokens.map((token) => ({
+      label: token.symbol,
+      value: token.address.toUpperCase(),
+    }))
   },
 
   unmounted() {

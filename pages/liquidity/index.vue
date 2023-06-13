@@ -39,23 +39,39 @@
     </a-form>
     <a-divider />
 
+    <a-button class="add-btn" type="primary" @click="showModal">Add</a-button>
+
     <Table
       :columns="columns"
       :data="liquidity"
       :on-submit="handleSubmit"
       :allow-delete="true"
       :form-component="EditLiquidity"
+      :allow-add="false"
       :loading="loading"
       :allow-remove="true"
       :on-remove="handleRemove"
       :on-delete="handleDelete"
     />
+    <a-modal
+      :visible="visible"
+      :title="title"
+      :footer="null"
+      @cancel="handleCancel"
+    >
+      <component
+        :is="AddLiquidity"
+        :form-data="formData"
+        :on-submit="handleSubmit"
+      />
+    </a-modal>
   </div>
 </template>
 
 <script>
 import { Form, Select } from 'ant-design-vue'
 import EditLiquidity from '../../components/liquidity/EditLiquidity.vue'
+import AddLiquidity from '../../components/liquidity/AddLiquidity.vue'
 
 export default {
   name: 'NuxtLiquidity',
@@ -73,6 +89,11 @@ export default {
     return {
       form: this.$form.createForm(this),
       wallets: [],
+      visible: false,
+      formData: {
+        tokens: [],
+      },
+      title: 'Mint Liquidity!',
 
       liquidity: [],
       wallet: '',
@@ -168,6 +189,7 @@ export default {
         },
       ],
       EditLiquidity,
+      AddLiquidity,
     }
   },
 
@@ -179,10 +201,16 @@ export default {
     if (this.wallets[0]) {
       this.getLiquidity(this.wallets[0]._id)
       this.wallet = this.wallets[0]._id
+      this.getTokens()
     }
   },
 
   methods: {
+    showModal() {
+      this.title = 'Add'
+      this.visible = true
+    },
+
     handleWalletChange(value) {
       if (!value) return
 
@@ -209,13 +237,32 @@ export default {
       this.loading = false
     },
 
+    async getTokens() {
+      this.loading = true
+      const tokens = await this.$axios.get(`/api/tokens`).catch((e) => {
+        this.$message.error(e.message)
+        return { data: [] }
+      })
+      this.formData.tokens = tokens.data
+      this.loading = false
+    },
+
     async handleSubmit(values) {
       this.loading = true
       try {
+        if(values.id) {
+
+        
         await this.$axios.put(
           `/api/uniswap/${this.wallet}/positions/${values.id}`,
           values
         )
+        }else  {
+          await this.$axios.post(
+            `/api/uniswap/${this.wallet}/positions`,
+            values
+          )
+        }
         await this.getLiquidity(this.wallet)
       } catch (error) {
         this.$message.error(error.message)
@@ -255,6 +302,11 @@ export default {
         .finally(() => {
           this.loading = false
         })
+    },
+
+    handleCancel() {
+      this.visible = false
+      this.formData = {}
     },
   },
 }
