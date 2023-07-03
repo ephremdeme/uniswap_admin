@@ -256,6 +256,13 @@ export default {
             depositedToken1: val.depositedToken1,
           })
         }
+        if (val && val.tokens) {
+          this.tokens = val?.tokens.map((token) => ({
+            label: token.symbol,
+            value: token.address.toUpperCase(),
+          }))
+
+        }
         if (!val || !val.tokenLow || !val.tokenHigh) {
           this.form.resetFields()
         }
@@ -268,7 +275,7 @@ export default {
   },
 
   mounted() {
-    this.tokens = this.formData.tokens.map((token) => ({
+    this.tokens = this.formData?.tokens.map((token) => ({
       label: token.symbol,
       value: token.address.toUpperCase(),
     }))

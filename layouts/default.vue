@@ -75,7 +75,7 @@ const NavKeys = {
 export default {
   computed: {
     activeNavKey() {
-      return NavKeys[this.$route.name.toUpperCase().split('-')[0]];
+      return NavKeys[this.$route.name?.toUpperCase().split('-')[0]];
     },
   },
   methods: {
