@@ -1,9 +1,11 @@
 <template>
   <div>
-    <div>Telegram Mint Liquidity</div>
     <a-row>
-      <a-col :span="20">
-        <AddLiquidity :on-submit="submitForm" :form-data="formData" />
+      <a-col :span="24" :style="{textAlign: 'center', marginBottom: '14px'}" >
+      <div>Telegram Mint Liquidity</div>
+      </a-col>
+      <a-col :span="23" :offset="1">
+        <AddLiquidity :on-submit="submitForm" :form-data="formData"  @fetch-pool-info="fetchPoolInfo"/>
       </a-col>
     </a-row>
   </div>
@@ -32,6 +34,11 @@ export default {
         if (val && oldVal && val.url !== oldVal.url) {
           this.telegramQuery = val
         }
+      },
+    },
+    FormData: {
+      handler: function (val, oldVal) {
+        console.log("Value => ", val);
       },
     },
   },
@@ -70,9 +77,9 @@ export default {
     async getTokens() {
       try {
         this.loading = true
-        const origin = new URL(this.telegramQuery.url).origin
+        const origin = 'http://localhost:5005'
         const tokens = await this.$axios
-          .$get(`${origin}/uniswap/api/tokens`, {
+          .$get(`${origin}/api/tokens`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: 'Bearer ' + this.telegramQuery.token,
@@ -88,6 +95,31 @@ export default {
         this.$message.error(err.message)
       }
     },
+
+    async fetchPoolInfo(values){
+      const {fee, token0, token1} = values;
+
+      const origin = 'http://localhost:5005'
+
+      const poolInfo = await this.$axios
+      .post(`${origin}/api/uniswap/poolInfo`, {
+        token0,
+        token1,
+        fee
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + this.telegramQuery.token,
+        },
+      })
+      .catch((e) => {
+        this.$message.error(e.message)
+        return {};
+      })
+      console.  ("Pool Info => ", poolInfo);
+
+      this.formData.poolInfo = poolInfo;
+    }
   },
 }
 </script>
