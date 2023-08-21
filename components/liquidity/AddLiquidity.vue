@@ -98,16 +98,16 @@
                     message: 'Please input a slippage value',
                   },
                 ],
-                initialValue: 0.3,
+                initialValue: 3000,
               },
             ]"
             name="fee"
             style="width: 100%; display: flex"
             @change="(ev) => handleOnSelect(ev.target.value, 'fee')"
           >
-            <a-radio :value="0.05"> 0.05% </a-radio>
-            <a-radio :value="0.3"> 0.3% </a-radio>
-            <a-radio :value="1"> 1% </a-radio>
+            <a-radio :value="500"> 0.05% </a-radio>
+            <a-radio :value="3000"> 0.3% </a-radio>
+            <a-radio :value="10000"> 1% </a-radio>
           </a-radio-group>
         </a-form-item>
       </a-col>
@@ -208,7 +208,12 @@
     </a-row>
 
     <a-form-item>
-      <a-button type="primary" html-type="submit" :loading="loading" :disabled="!formData.poolInfo">
+      <a-button
+        type="primary"
+        html-type="submit"
+        :loading="loading"
+        :disabled="!formData.poolInfo"
+      >
         Submit
       </a-button>
       <a-button
@@ -304,8 +309,14 @@ export default {
         [name]: value,
       })
 
-      if(name === 'fee' || name === 'token0' || name === 'token1') {
-        if(this.form.getFieldValue('token0') && this.form.getFieldValue('token1') && this.form.getFieldValue('fee')) {
+      if (name === 'fee' || name === 'token0' || name === 'token1') {
+        if (
+          this.form.getFieldValue('token0') &&
+          !Array.isArray(this.form.getFieldValue('token0')) &&
+          this.form.getFieldValue('token1') &&
+          !Array.isArray(this.form.getFieldValue('token1')) &&
+          this.form.getFieldValue('fee')
+        ) {
           this.$emit('fetch-pool-info', {
             token0: this.form.getFieldValue('token0'),
             token1: this.form.getFieldValue('token1'),
@@ -313,8 +324,6 @@ export default {
           })
         }
       }
-
-      console.log('Form => ', this.form.getFieldsValue());
     },
 
     resetForm() {

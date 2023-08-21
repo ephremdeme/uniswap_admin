@@ -1,11 +1,15 @@
 <template>
   <div>
     <a-row>
-      <a-col :span="24" :style="{textAlign: 'center', marginBottom: '14px'}" >
-      <div>Telegram Mint Liquidity</div>
+      <a-col :span="24" :style="{ textAlign: 'center', marginBottom: '14px' }">
+        <div>Telegram Mint Liquidity</div>
       </a-col>
       <a-col :span="23" :offset="1">
-        <AddLiquidity :on-submit="submitForm" :form-data="formData"  @fetch-pool-info="fetchPoolInfo"/>
+        <AddLiquidity
+          :on-submit="submitForm"
+          :form-data="formData"
+          @fetch-pool-info="fetchPoolInfo"
+        />
       </a-col>
     </a-row>
   </div>
@@ -38,7 +42,7 @@ export default {
     },
     FormData: {
       handler: function (val, oldVal) {
-        console.log("Value => ", val);
+        console.log('Value => ', val)
       },
     },
   },
@@ -87,7 +91,7 @@ export default {
           })
           .catch((e) => {
             this.$message.error(e.message)
-            return [];
+            return []
           })
         this.formData.tokens = tokens
         this.loading = false
@@ -96,30 +100,34 @@ export default {
       }
     },
 
-    async fetchPoolInfo(values){
-      const {fee, token0, token1} = values;
+    async fetchPoolInfo(values) {
+      const { fee, token0, token1 } = values
 
       const origin = 'http://localhost:5005'
 
       const poolInfo = await this.$axios
-      .post(`${origin}/api/uniswap/poolInfo`, {
-        token0,
-        token1,
-        fee
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + this.telegramQuery.token,
-        },
-      })
-      .catch((e) => {
-        this.$message.error(e.message)
-        return {};
-      })
-      console.  ("Pool Info => ", poolInfo);
+        .post(
+          `${origin}/api/uniswap/poolInfo`,
+          {
+            token0,
+            token1,
+            fee,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + this.telegramQuery.token,
+            },
+          }
+        )
+        .catch((e) => {
+          this.$message.error(e.message)
+          return {}
+        })
+      console.log('Pool Info => ', poolInfo)
 
-      this.formData.poolInfo = poolInfo;
-    }
+      this.formData.poolInfo = poolInfo
+    },
   },
 }
 </script>
