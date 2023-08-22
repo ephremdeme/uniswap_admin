@@ -1,9 +1,15 @@
 <template>
   <div>
-    <div>Telegram Mint Liquidity</div>
     <a-row>
-      <a-col :span="20">
-        <AddLiquidity :on-submit="submitForm" :form-data="formData" />
+      <a-col :span="24" :style="{ textAlign: 'center', marginBottom: '14px' }">
+        <div>Telegram Mint Liquidity</div>
+      </a-col>
+      <a-col :span="23" :offset="1">
+        <AddLiquidity
+          :on-submit="submitForm"
+          :form-data="formData"
+          @fetch-pool-info="fetchPoolInfo"
+        />
       </a-col>
     </a-row>
   </div>
@@ -21,6 +27,7 @@ export default {
     return {
       formData: {
         tokens: [],
+        poolInfo: null,
       },
       telegramQuery: null,
     }
@@ -31,6 +38,18 @@ export default {
       handler: function (val, oldVal) {
         if (val && oldVal && val.url !== oldVal.url) {
           this.telegramQuery = val
+        }
+      },
+    },
+
+    formData: {
+      handler: function (val, oldVal) {
+        if (val && oldVal && val.tokens !== oldVal.tokens) {
+          this.formData = val
+        }
+
+        if (val && oldVal && val.poolInfo !== oldVal.poolInfo) {
+          this.formData = val
         }
       },
     },
@@ -72,7 +91,7 @@ export default {
         this.loading = true
         const origin = new URL(this.telegramQuery.url).origin
         const tokens = await this.$axios
-          .$get(`${origin}/uniswap/api/tokens`, {
+        .$get(`${origin}/uniswap/api/tokens`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: 'Bearer ' + this.telegramQuery.token,
@@ -80,13 +99,41 @@ export default {
           })
           .catch((e) => {
             this.$message.error(e.message)
-            return [];
+            return []
           })
         this.formData.tokens = tokens
         this.loading = false
       } catch (err) {
         this.$message.error(err.message)
       }
+    },
+
+    async fetchPoolInfo(values) {
+      const { fee, token0, token1 } = values
+
+      const origin = new URL(this.telegramQuery.url).origin
+
+      const poolInfo = await this.$axios
+        .post(
+          `${origin}/uniswap/api/uniswap/poolInfo`,
+          {
+            token0,
+            token1,
+            fee,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + this.telegramQuery.token,
+            },
+          }
+        )
+        .catch((e) => {
+          this.$message.error(e.message)
+          return {}
+        })
+
+      this.formData.poolInfo = poolInfo.data
     },
   },
 }
