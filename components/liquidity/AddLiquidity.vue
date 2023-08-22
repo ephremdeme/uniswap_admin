@@ -230,7 +230,7 @@ export default {
       return ratio
     },
     price() {
-      if (!this.poolInfo || !this.poolInfo.token0 || !this.stopHigh || isNaN(this.stopLow)) return NaN;
+      if (!this.poolInfo || !this.poolInfo.token0) return NaN;
 
       const price = getPriceFromTick(Math.abs(this.poolInfo.tick),
         this.formData.tokens.find(token => token.address.toUpperCase() === this.token1?.toUpperCase()).decimals,
