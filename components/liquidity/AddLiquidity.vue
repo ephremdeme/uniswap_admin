@@ -167,7 +167,7 @@
     </a-row>
 
     <a-form-item>
-      <a-button type="primary" html-type="submit" :loading="loading" :disabled="!(token0Amount && token1Amount)">
+      <a-button type="primary" html-type="submit" :loading="loading" :disabled="!(!isNaN(token0Amount) && token1Amount )">
         Submit
       </a-button>
       <a-button style="margin-left: 8px" :disabled="loading" :loading="loading" @click="resetForm">
@@ -282,9 +282,9 @@ export default {
     depositRatio: {
       handler: function (val, oldVal) {
         if(val && val !== oldVal) {
-          this.formValues.token1Amount = this.token0Amount * this.depositRatio
+          this.formValues.token1Amount = (this.token0Amount || 0) * this.depositRatio
           this.form.setFieldsValue({
-            token1Amount: (this.token0Amount * this.depositRatio).toFixed(2),
+            token1Amount: ((this.token0Amount || 0) * this.depositRatio).toFixed(2),
           })
         }
         return val
