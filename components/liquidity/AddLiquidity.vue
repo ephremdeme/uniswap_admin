@@ -90,7 +90,7 @@
       </a-col>
     </a-row>
 <!-- display price using a simple div or p -->
-    <div v-if="!isNaN(depositRatio)">Price: {{ price.toFixed(2) }}</div>
+    <div v-if="!isNaN(price)">Price: {{ price.toFixed(2) }}</div>
 
     <a-row :gutter="16">
       <a-col :span="11">
