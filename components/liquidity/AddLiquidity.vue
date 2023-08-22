@@ -3,28 +3,21 @@
     <a-row :gutter="16">
       <a-col :span="11">
         <a-form-item label="Token">
-          <a-select
-            v-decorator="[
-              'token0',
-              {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please select a token0',
-                  },
-                ],
-                initialValue: [],
-                valuePropName: 'option',
-              },
-            ]"
-            placeholder="Select a Token0"
-            @change="(val) => handleOnSelect(val, 'token0')"
-          >
-            <a-select-option
-              v-for="token in tokens"
-              :key="token.value"
-              :value="token.value"
-            >
+          <a-select 
+          v-decorator="[
+            'token0',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please select a token0',
+                },
+              ],
+              initialValue: [],
+              valuePropName: 'option',
+            },
+          ]" placeholder="Select a Token0" @change="(val) => handleOnChange(val, 'token0')">
+            <a-select-option v-for="token in tokens" :key="token.value" :value="token.value">
               {{ token.label }}
             </a-select-option>
           </a-select>
@@ -32,28 +25,21 @@
       </a-col>
       <a-col :span="11">
         <a-form-item label="Token">
-          <a-select
-            v-decorator="[
-              'token1',
-              {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please select a token1',
-                  },
-                ],
-                initialValue: [],
-                valuePropName: 'option',
-              },
-            ]"
-            placeholder="Select a Token1"
-            @change="(val) => handleOnSelect(val, 'token1')"
-          >
-            <a-select-option
-              v-for="token in tokens"
-              :key="token.value"
-              :value="token.value"
-            >
+          <a-select 
+          v-decorator="[
+            'token1',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please select a token1',
+                },
+              ],
+              initialValue: [],
+              valuePropName: 'option',
+            },
+          ]" placeholder="Select a Token1" @change="(val) => handleOnChange(val, 'token1')">
+            <a-select-option v-for="token in tokens" :key="token.value" :value="token.value">
               {{ token.label }}
             </a-select-option>
           </a-select>
@@ -64,47 +50,38 @@
     <a-row :gutter="17">
       <a-col :span="11">
         <a-form-item label="Slippage">
-          <a-input-number
-            v-decorator="[
-              'slippage',
-              {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please input a slippage value',
-                  },
-                ],
-                initialValue: 1,
-              },
-            ]"
-            :min="0"
-            :max="100"
-            :step="1"
-            :formatter="(value) => `${value}%`"
-            :parser="(value) => value.replace('%', '')"
-            style="width: 100%"
-          />
+          <a-input-number 
+          v-decorator="[
+            'slippage',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input a slippage value',
+                },
+              ],
+              initialValue: 1,
+            },
+          ]" :min="0" :max="100" :step="1" :formatter="(value) => `${value}%`"
+            :parser="(value) => value.replace('%', '')" style="width: 100%" placeholder="Slippage"
+            @change="(ev) => handleOnChange(ev.target.value, 'slippage')" />
         </a-form-item>
       </a-col>
       <a-col :span="11">
         <a-form-item label="Fee">
-          <a-radio-group
-            v-decorator="[
-              'fee',
-              {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please input a slippage value',
-                  },
-                ],
-                initialValue: 3000,
-              },
-            ]"
-            name="fee"
-            style="width: 100%; display: flex"
-            @change="(ev) => handleOnSelect(ev.target.value, 'fee')"
-          >
+          <a-radio-group 
+          v-decorator="[
+            'fee',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input a slippage value',
+                },
+              ],
+              initialValue: 3000,
+            },
+          ]" name="fee" style="width: 100%; display: flex" @change="(ev) => handleOnChange(ev.target.value, 'fee')">
             <a-radio :value="500"> 0.05% </a-radio>
             <a-radio :value="3000"> 0.3% </a-radio>
             <a-radio :value="10000"> 1% </a-radio>
@@ -112,116 +89,88 @@
         </a-form-item>
       </a-col>
     </a-row>
-
-    <a-row :gutter="16">
-      <a-col :span="11">
-        <a-form-item label="Token 0 Amount">
-          <a-input-number
-            v-decorator="[
-              'token0Amount',
-              {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please input an amount',
-                  },
-                ],
-              },
-            ]"
-            placeholder="Token0 Amount"
-            :min="0"
-            :step="10"
-            :disabled="!formData.poolInfo"
-            style="width: 100%"
-          />
-        </a-form-item>
-      </a-col>
-      <a-col :span="11">
-        <a-form-item label="Token 1 Amount">
-          <a-input-number
-            v-decorator="[
-              'token1Amount',
-              {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please input an amount',
-                  },
-                ],
-              },
-            ]"
-            :min="0"
-            :step="10"
-            :disabled="!formData.poolInfo"
-            style="width: 100%"
-            placeholder="Token1 Amount"
-          />
-        </a-form-item>
-      </a-col>
-    </a-row>
+<!-- display price using a simple div or p -->
+    <div v-if="!isNaN(depositRatio)">Price: {{ price.toFixed(2) }}</div>
 
     <a-row :gutter="16">
       <a-col :span="11">
         <a-form-item label="Stop Low">
-          <a-input-number
-            v-decorator="[
-              'stopLow',
-              {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please input a stop low value',
-                  },
-                ],
-              },
-            ]"
-            :min="0"
-            :step="10"
-            style="width: 100%"
-            placeholder="Stop Low"
-            :disabled="!formData.poolInfo"
-          />
+          <a-input-number 
+          v-decorator="[
+            'stopLow',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input a stop low value',
+                },
+              ],
+            },
+          ]" :min="0" style="width: 100%" placeholder="Stop Low" :disabled="!(poolInfo && poolInfo.tick)"
+            @change="(ev) => handleOnChange(ev, 'stopLow')" />
         </a-form-item>
       </a-col>
       <a-col :span="11">
         <a-form-item label="Stop High">
           <a-input-number
-            v-decorator="[
-              'stopHigh',
-              {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please input a stop high value',
-                  },
-                ],
-              },
-            ]"
-            :min="0"
-            :step="10"
-            style="width: 100%"
-            placeholder="Stop High"
-            :disabled="!formData.poolInfo"
-          />
+           v-decorator="[
+            'stopHigh',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input a stop high value',
+                },
+              ],
+            },
+          ]" :min="0" style="width: 100%" placeholder="Stop High" :disabled="!(poolInfo && poolInfo.tick)"
+            @change="(ev) => handleOnChange(ev, 'stopHigh')" />
+        </a-form-item>
+      </a-col>
+    </a-row>
+
+    <a-row :gutter="16">
+      <a-col :span="11">
+        <a-form-item label="Token 0 Amount">
+          <a-input-number 
+          v-decorator="[
+            'token0Amount',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input an amount',
+                },
+              ],
+            },
+          ]" placeholder="Token0 Amount" :min="0" :step="10" :disabled="isNaN(depositRatio)" style="width: 100%"
+            @change="(ev) => handleOnChange(ev, 'token0Amount')" />
+        </a-form-item>
+      </a-col>
+      <a-col :span="11">
+        <a-form-item label="Token 1 Amount">
+          <a-input-number 
+          v-decorator="[
+            'token1Amount',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input an amount',
+                },
+              ],
+            },
+          ]" :min="0" :step="10" :disabled="isNaN(depositRatio)" style="width: 100%" placeholder="Token1 Amount"
+            @change="(ev) => handleOnChange(ev, 'token1Amount')" />
         </a-form-item>
       </a-col>
     </a-row>
 
     <a-form-item>
-      <a-button
-        type="primary"
-        html-type="submit"
-        :loading="loading"
-        :disabled="!formData.poolInfo"
-      >
+      <a-button type="primary" html-type="submit" :loading="loading" :disabled="!(token0Amount && token1Amount)">
         Submit
       </a-button>
-      <a-button
-        style="margin-left: 8px"
-        :disabled="loading"
-        :loading="loading"
-        @click="resetForm"
-      >
+      <a-button style="margin-left: 8px" :disabled="loading" :loading="loading" @click="resetForm">
         Reset
       </a-button>
     </a-form-item>
@@ -230,6 +179,7 @@
 
 <script>
 import { Form, Select, InputNumber, Button, Radio } from 'ant-design-vue'
+import { getPriceFromTick, getPositionTokensDepositRatio } from '../../utils/math'
 
 export default {
   name: 'NuxtAddLiquidity',
@@ -245,11 +195,11 @@ export default {
   props: {
     onSubmit: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
     formData: {
       type: Object,
-      default: () => {},
+      default: () => { },
     },
   },
   data() {
@@ -259,19 +209,84 @@ export default {
       layout: 'vertical',
       placeholder: 'Select a token',
       tokens: [],
+      formValues: {
+        token0: null,
+        token1: null,
+        token0Amount: null,
+        token1Amount: null,
+        fee: 3000,
+        stopLow: null,
+        stopHigh: null,
+      },
+      poolInfo: null,
     }
+  },
+
+  computed: {
+    depositRatio() {
+      if (!this.poolInfo || !this.poolInfo.token0 || !this.formValues.stopHigh || isNaN(this.formValues.stopLow)) return NaN;
+
+      const ratio = getPositionTokensDepositRatio(this.price, this.formValues.stopLow, this.formValues.stopHigh)
+      return ratio
+    },
+    price() {
+      if (!this.poolInfo || !this.poolInfo.token0 || !this.stopHigh || isNaN(this.stopLow)) return NaN;
+
+      const price = getPriceFromTick(Math.abs(this.poolInfo.tick),
+        this.formData.tokens.find(token => token.address.toUpperCase() === this.token1?.toUpperCase()).decimals,
+        this.formData.tokens.find(token => token.address.toUpperCase() === this.token0?.toUpperCase()).decimals,
+      );
+
+      return price
+    },
+    token0() {
+      return this.formValues.token0
+    },
+    token1() {
+      return this.formValues.token1
+    },
+    stopLow() {
+      return this.formValues.stopLow
+    },
+    stopHigh() {
+      return this.formValues.stopHigh
+    },
+    token0Amount() {
+      return this.formValues.token0Amount || 0;
+    },
+    token1Amount() {
+      return this.formValues.token1Amount || 0;
+    },
+    fee() {
+      return this.formValues.fee
+    },
   },
 
   watch: {
     formData: {
       handler: function (val, oldVal) {
-        if (val && val.tokens)
+        if (val && val.tokens && val.tokens !== this.tokens) {
           this.tokens = val?.tokens.map((token) => ({
             label: token.symbol,
             value: token.address.toUpperCase(),
           }))
-
-        if (!val || !val.tokenLow || !val.tokenHigh) this.form.resetFields()
+        }
+        if (val && val.poolInfo && val.poolInfo !== this.poolInfo) {
+          this.poolInfo = val.poolInfo
+        }
+        return val
+      },
+      deep: true,
+      immediate: true,
+    },
+    depositRatio: {
+      handler: function (val, oldVal) {
+        if(val && val !== oldVal) {
+          this.formValues.token1Amount = this.token0Amount * this.depositRatio
+          this.form.setFieldsValue({
+            token1Amount: (this.token0Amount * this.depositRatio).toFixed(2),
+          })
+        }
         return val
       },
       deep: true,
@@ -304,23 +319,49 @@ export default {
         }
       })
     },
-    handleOnSelect(value, name) {
+
+    handleOnChange(value, name) {
+      if (name === 'token0' && value === this.token1 || name === 'token1' && value === this.token0) {
+        this.$message.error('Token0 and Token1 must be different')
+        this.form.setFieldsValue({
+          [name]: null,
+        })
+        this.formValues[name] = null
+        return
+      }
+
       this.form.setFieldsValue({
         [name]: value,
       })
 
+      this.formValues[name] = value
+
+      if (name === 'token0Amount') {
+        this.formValues.token1Amount = this.token0Amount * this.depositRatio
+        this.form.setFieldsValue({
+          token1Amount: (this.token0Amount * this.depositRatio).toFixed(2),
+        })
+      }
+
+      if (name === 'token1Amount') {
+        this.formValues.token0Amount = this.token1Amount / this.depositRatio
+        this.form.setFieldsValue({
+          token0Amount: (this.token1Amount / this.depositRatio).toFixed(2),
+        })
+      }
+
       if (name === 'fee' || name === 'token0' || name === 'token1') {
         if (
-          this.form.getFieldValue('token0') &&
-          !Array.isArray(this.form.getFieldValue('token0')) &&
-          this.form.getFieldValue('token1') &&
-          !Array.isArray(this.form.getFieldValue('token1')) &&
-          this.form.getFieldValue('fee')
+          this.token0 &&
+          !Array.isArray(this.token0) &&
+          this.token1 &&
+          !Array.isArray(this.token1) &&
+          this.fee
         ) {
           this.$emit('fetch-pool-info', {
-            token0: this.form.getFieldValue('token0'),
-            token1: this.form.getFieldValue('token1'),
-            fee: this.form.getFieldValue('fee'),
+            token0: this.token0,
+            token1: this.token1,
+            fee: this.fee,
           })
         }
       }
