@@ -27,6 +27,7 @@ export default {
     return {
       formData: {
         tokens: [],
+        poolInfo: null,
       },
       telegramQuery: null,
     }
@@ -40,9 +41,16 @@ export default {
         }
       },
     },
-    FormData: {
+
+    formData: {
       handler: function (val, oldVal) {
-        console.log('Value => ', val)
+        if (val && oldVal && val.tokens !== oldVal.tokens) {
+          this.formData = val
+        }
+
+        if (val && oldVal && val.poolInfo !== oldVal.poolInfo) {
+          this.formData = val
+        }
       },
     },
   },
@@ -81,9 +89,9 @@ export default {
     async getTokens() {
       try {
         this.loading = true
-        const origin = 'http://localhost:5005'
+        const origin = new URL(this.telegramQuery.url).origin
         const tokens = await this.$axios
-          .$get(`${origin}/api/tokens`, {
+        .$get(`${origin}/uniswap/api/tokens`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: 'Bearer ' + this.telegramQuery.token,
@@ -103,11 +111,11 @@ export default {
     async fetchPoolInfo(values) {
       const { fee, token0, token1 } = values
 
-      const origin = 'http://localhost:5005'
+      const origin = new URL(this.telegramQuery.url).origin
 
       const poolInfo = await this.$axios
         .post(
-          `${origin}/api/uniswap/poolInfo`,
+          `${origin}/uniswap/api/uniswap/poolInfo`,
           {
             token0,
             token1,
@@ -124,9 +132,8 @@ export default {
           this.$message.error(e.message)
           return {}
         })
-      console.log('Pool Info => ', poolInfo)
 
-      this.formData.poolInfo = poolInfo
+      this.formData.poolInfo = poolInfo.data
     },
   },
 }
