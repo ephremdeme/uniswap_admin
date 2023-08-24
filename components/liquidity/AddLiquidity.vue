@@ -277,10 +277,34 @@ export default {
     depositRatio: {
       handler: function (val, oldVal) {
         if(val && val !== oldVal) {
-          this.formValues.token1Amount = (this.token0Amount || 0) * this.depositRatio
+
+          if(!this.token0Amount) {
+            this.formValues.token0Amount = 1
+            this.form.setFieldsValue({
+              token0Amount: 1,
+            })
+          }
+
+          this.formValues.token1Amount = (this.token0Amount || 1) * this.depositRatio
           this.form.setFieldsValue({
-            token1Amount: ((this.token0Amount || 0) * this.depositRatio).toFixed(2),
+            token1Amount: ((this.token0Amount || 1) * this.depositRatio),
           })
+        }
+        return val
+      },
+      deep: true,
+      immediate: true,
+    },
+    price: {
+      handler: function (val, oldVal) {
+        if(val && val !== oldVal) {
+          this.formValues.stopLow = this.price * 0.90
+          this.formValues.stopHigh = this.price * 1.10
+
+          this.form.setFieldsValue({
+            stopLow: (this.price * 0.90),
+            stopHigh: (this.price * 1.10),
+          });
         }
         return val
       },
@@ -316,7 +340,6 @@ export default {
     },
 
     handleOnChange(value, name) {
-      console.log('handleOnChange', this.formValues, this.token0, this.token1);
       if (name === 'token0' && value === this.token1 || name === 'token1' && value === this.token0) {
         this.$message.error('Token0 and Token1 must be different', 5)
         this.form.setFieldsValue({
@@ -328,6 +351,16 @@ export default {
         })
 
         this.formValues[name] = value
+        return
+      }
+
+      if(name === 'stopHigh' && this.price > value) {
+        this.$message.error('Stop High must be greater than price', 5)
+        this.form.setFieldsValue({
+          [name]: undefined,
+        })
+
+        this.formValues[name] = undefined
         return
       }
 
