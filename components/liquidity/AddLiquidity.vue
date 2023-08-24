@@ -13,10 +13,10 @@
                   message: 'Please select a token0',
                 },
               ],
-              initialValue: [],
-              valuePropName: 'option',
+              initialValue: undefined,
+              valuePropName: 'value',
             },
-          ]" placeholder="Select a Token0" @change="(val) => handleOnChange(val, 'token0')">
+          ]"     show-search placeholder="Select a Token0"     option-filter-prop="children" @change="(val) => handleOnChange(val, 'token0')">
             <a-select-option v-for="token in tokens" :key="token.value" :value="token.value">
               {{ token.label }}
             </a-select-option>
@@ -35,10 +35,10 @@
                   message: 'Please select a token1',
                 },
               ],
-              initialValue: [],
-              valuePropName: 'option',
+              initialValue: undefined,
+              valuePropName: 'value',
             },
-          ]" placeholder="Select a Token1" @change="(val) => handleOnChange(val, 'token1')">
+          ]"     show-search     option-filter-prop="children" placeholder="Select a Token1" @change="(val) => handleOnChange(val, 'token1')">
             <a-select-option v-for="token in tokens" :key="token.value" :value="token.value">
               {{ token.label }}
             </a-select-option>
@@ -90,7 +90,7 @@
       </a-col>
     </a-row>
 <!-- display price using a simple div or p -->
-    <div v-if="!isNaN(price)">Price: {{ price.toFixed(2) }}</div>
+    <div v-if="!isNaN(price || poolInfo?.price)">Price: {{ price }}</div>
 
     <a-row :gutter="16">
       <a-col :span="11">
@@ -179,7 +179,7 @@
 
 <script>
 import { Form, Select, InputNumber, Button, Radio } from 'ant-design-vue'
-import { getPriceFromTick, getPositionTokensDepositRatio } from '../../utils/math'
+import { getPositionTokensDepositRatio } from '../../utils/math'
 
 export default {
   name: 'NuxtAddLiquidity',
@@ -230,14 +230,9 @@ export default {
       return ratio
     },
     price() {
-      if (!this.poolInfo || !this.poolInfo.token0) return NaN;
+      if (!this.poolInfo || !this.poolInfo.price) return NaN;
 
-      const price = getPriceFromTick(Math.abs(this.poolInfo.tick),
-        this.formData.tokens.find(token => token.address.toUpperCase() === this.token1?.toUpperCase()).decimals,
-        this.formData.tokens.find(token => token.address.toUpperCase() === this.token0?.toUpperCase()).decimals,
-      );
-
-      return price
+      return this.poolInfo.price
     },
     token0() {
       return this.formValues.token0
@@ -321,12 +316,18 @@ export default {
     },
 
     handleOnChange(value, name) {
+      console.log('handleOnChange', this.formValues, this.token0, this.token1);
       if (name === 'token0' && value === this.token1 || name === 'token1' && value === this.token0) {
-        this.$message.error('Token0 and Token1 must be different')
+        this.$message.error('Token0 and Token1 must be different', 5)
         this.form.setFieldsValue({
-          [name]: null,
+          [name === 'token0' ? 'token1' : 'token0']: undefined,
         })
-        this.formValues[name] = null
+        this.formValues[name === 'token0' ? 'token1' : 'token0'] = undefined
+        this.form.setFieldsValue({
+          [name]: value,
+        })
+
+        this.formValues[name] = value
         return
       }
 
