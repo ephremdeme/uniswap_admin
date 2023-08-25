@@ -5,11 +5,14 @@
         <div>Telegram Mint Liquidity</div>
       </a-col>
       <a-col :span="23" :offset="1">
-        <AddLiquidity
-          :on-submit="submitForm"
-          :form-data="formData"
-          @fetch-pool-info="fetchPoolInfo"
-        />
+        <a-spin :spinning="loading" :delay="500">
+          <AddLiquidity
+            :on-submit="submitForm"
+            :form-data="formData"
+            :loading="loading"
+            @fetch-pool-info="fetchPoolInfo"
+          />
+        </a-spin>
       </a-col>
     </a-row>
   </div>
@@ -30,6 +33,7 @@ export default {
         poolInfo: null,
       },
       telegramQuery: null,
+      loading: false,
     }
   },
 
@@ -74,12 +78,14 @@ export default {
     // eslint-disable-next-line require-await
     async submitForm(values) {
       try {
+        this.loading = true
         await this.$axios.$post(this.telegramQuery.url, values, {
           headers: {
             'Content-Type': 'application/json',
-            authorization: 'Bearer ' + this.telegramQuery.token,
+            Authorization: 'Bearer ' + this.telegramQuery.token,
           },
         })
+        this.loading = false
         this.$message.success('Position updated successfully')
       } catch (err) {
         this.$message.error(err.message)
@@ -132,7 +138,7 @@ export default {
           this.$message.error(e.message)
           return {}
         })
-
+      this.loading = false
       this.formData.poolInfo = poolInfo.data
     },
   },

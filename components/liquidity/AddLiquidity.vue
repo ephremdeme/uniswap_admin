@@ -201,11 +201,14 @@ export default {
       type: Object,
       default: () => { },
     },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       form: this.$form.createForm(this),
-      loading: false,
       layout: 'vertical',
       placeholder: 'Select a token',
       tokens: [],
@@ -328,13 +331,11 @@ export default {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
-          this.loading = true
           this.onSubmit({
             ...values,
             id: this.formData.id,
             wallet: this.formData.wallet,
           })
-          this.loading = false
         }
       })
     },
