@@ -85,10 +85,11 @@ export default {
             Authorization: 'Bearer ' + this.telegramQuery.token,
           },
         })
-        this.loading = false
         this.$message.success('Position updated successfully')
       } catch (err) {
         this.$message.error(err.message)
+      } finally{
+        this.loading = false;
       }
     },
 
@@ -108,9 +109,10 @@ export default {
             return []
           })
         this.formData.tokens = tokens
-        this.loading = false
       } catch (err) {
         this.$message.error(err.message)
+      } finally {
+        this.loading = false
       }
     },
 

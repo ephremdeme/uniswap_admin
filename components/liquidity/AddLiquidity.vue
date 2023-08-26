@@ -64,7 +64,7 @@
             },
           ]" :min="0" :max="100" :step="1" :formatter="(value) => `${value}%`"
             :parser="(value) => value.replace('%', '')" style="width: 100%" placeholder="Slippage"
-            @change="(ev) => handleOnChange(ev.target.value, 'slippage')" />
+            @change="(ev) => handleOnChange(ev, 'slippage')" />
         </a-form-item>
       </a-col>
       <a-col :span="11">
@@ -81,7 +81,8 @@
               ],
               initialValue: 3000,
             },
-          ]" name="fee" style="width: 100%; display: flex" @change="(ev) => handleOnChange(ev.target.value, 'fee')">
+          ]" name="fee" style="width: 100%; display: flex; flex-wrap: wrap;" @change="(ev) => handleOnChange(ev.target.value, 'fee')">
+            <a-radio :value="100"> 0.01% </a-radio>
             <a-radio :value="500"> 0.05% </a-radio>
             <a-radio :value="3000"> 0.3% </a-radio>
             <a-radio :value="10000"> 1% </a-radio>
@@ -372,16 +373,16 @@ export default {
       this.formValues[name] = value
 
       if (name === 'token0Amount') {
-        this.formValues.token1Amount = this.token0Amount * this.depositRatio
+        this.formValues.token1Amount = +(this.token0Amount * this.depositRatio)
         this.form.setFieldsValue({
-          token1Amount: (this.token0Amount * this.depositRatio).toFixed(2),
+          token1Amount: +(this.token0Amount * this.depositRatio).toFixed(4),
         })
       }
 
       if (name === 'token1Amount') {
-        this.formValues.token0Amount = this.token1Amount / this.depositRatio
+        this.formValues.token0Amount = +(this.token1Amount / this.depositRatio)
         this.form.setFieldsValue({
-          token0Amount: (this.token1Amount / this.depositRatio).toFixed(2),
+          token0Amount: +(this.token1Amount / this.depositRatio).toFixed(4),
         })
       }
 
