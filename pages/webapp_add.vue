@@ -98,7 +98,7 @@ export default {
         this.loading = true
         const origin = new URL(this.telegramQuery.url).origin
         const tokens = await this.$axios
-        .$get(`${origin}/uniswap/api/tokens`, {
+        .$get(`${origin}/${origin.includes('ephrem') ? 'uniswap' : 'service'}/api/tokens`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: 'Bearer ' + this.telegramQuery.token,
@@ -123,7 +123,7 @@ export default {
 
       const poolInfo = await this.$axios
         .post(
-          `${origin}/uniswap/api/uniswap/poolInfo`,
+          `${origin}/${origin.includes('ephrem') ? 'uniswap' : 'service'}/api/uniswap/poolInfo`,
           {
             token0,
             token1,
