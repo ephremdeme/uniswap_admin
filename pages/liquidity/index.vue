@@ -170,14 +170,14 @@ export default {
         {
           title: 'Token Low',
           dataIndex: 'tokenLow.symbol',
-          key: 'token',
+          key: 'tokenLow',
           scopedSlots: { customRender: 'tags' },
           width: 120,
         },
         {
           title: 'Token High',
           dataIndex: 'tokenHigh.symbol',
-          key: 'token',
+          key: 'tokenHigh',
           scopedSlots: { customRender: 'tags' },
           width: 120,
         },
