@@ -18,10 +18,9 @@
           :columns="columns"
           :data="tokens"
           :pagination="false"
-          :form-component="AddToken"
           :allow-edit="false"
+          :allow-delete="false"
           :on-submit="onSubmit"
-          :on-delete="onDelete"
         />
       </div>
     </div>
@@ -29,7 +28,6 @@
 </template>
 
 <script>
-import AddToken from '../../components/wallets/AddToken.vue'
 
 export default {
   name: 'WalletDetailPage',
@@ -48,72 +46,33 @@ export default {
           title: 'Name',
           dataIndex: 'name',
           key: 'name',
-          width: 200,
+          width: 100,
         },
         {
           title: 'Symbol',
           dataIndex: 'symbol',
           key: 'symbol',
-          width: 80,
+          width: 40,
           scopedSlots: { customRender: 'tags' },
-        },
-        {
-          title: 'Address',
-          dataIndex: 'address',
-          key: 'address',
-          width: 200,
         },
         {
           title: 'Balance',
           dataIndex: 'balance',
           key: 'balance',
-          width: 200,
+          width: 60,
         },
         {
-          title: 'Action',
-          key: 'action',
+          title: 'Address',
+          dataIndex: 'address',
+          key: 'address',
           width: 100,
-          scopedSlots: { customRender: 'action' },
         },
       ],
-      AddToken,
     }
   },
   methods: {
-    onSubmit(record) {
-      // this.$router.push(`/accounts/${record.id}`)
-      if (record._id) {
-        this.$axios
-          .put(`/api/accounts/${this.data._id}/tokens/${record._id}`, record)
-          .then(() => {
-            this.$message.success('Update success')
-            this.$nuxt.refresh()
-          })
-          .catch(() => {
-            this.$message.error('Update failed')
-          })
-      } else {
-        this.$axios
-          .post(`/api/accounts/${this.data._id}/tokens`, record)
-          .then(() => {
-            this.$message.success('Add success')
-            this.$nuxt.refresh()
-          })
-          .catch(() => {
-            this.$message.error('Add failed')
-          })
-      }
-    },
-    onDelete(record) {
-      this.$axios
-        .delete(`/api/accounts/${this.data._id}/tokens/${record._id}`)
-        .then(() => {
-          this.$message.success('Delete success')
-          this.$nuxt.refresh()
-        })
-        .catch(() => {
-          this.$message.error('Delete failed')
-        })
+    onSubmit() {
+      console.log('submit')
     },
   },
 }
