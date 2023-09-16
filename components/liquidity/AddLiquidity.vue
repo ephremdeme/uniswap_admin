@@ -2,7 +2,7 @@
   <a-form :form="form" :layout="layout" @submit="handleSubmit">
     <a-row :gutter="16">
       <a-col :span="11">
-        <a-form-item label="Token">
+        <a-form-item label="Token" >
           <a-select 
           v-decorator="[
             'token0',
@@ -142,10 +142,20 @@
                   required: true,
                   message: 'Please input an amount',
                 },
+                {
+                  validator: (rule, value, callback) => {
+                    if (value > token0Balance) {
+                      callback('Insufficient balance')
+                    }
+                    callback()
+                  },
+                }
               ],
             },
-          ]" placeholder="Token0 Amount" :min="0" :step="10" :disabled="isNaN(depositRatio)" style="width: 100%"
+          ]" placeholder="Token0 Amount" :min="0"  :step="10" :disabled="isNaN(depositRatio)" style="width: 100%"
             @change="(ev) => handleOnChange(ev, 'token0Amount')" />
+          <!-- display balance here like uniswap liquidity add page using helper text -->
+          <p v-if="token0">Balance: {{ token0Balance }}</p>
         </a-form-item>
       </a-col>
       <a-col :span="11">
@@ -159,10 +169,19 @@
                   required: true,
                   message: 'Please input an amount',
                 },
+                {
+                  validator: (rule, value, callback) => {
+                    if (value > token0Balance) {
+                      callback('Insufficient balance')
+                    }
+                    callback()
+                  },
+                }
               ],
             },
           ]" :min="0" :step="10" :disabled="isNaN(depositRatio)" style="width: 100%" placeholder="Token1 Amount"
             @change="(ev) => handleOnChange(ev, 'token1Amount')" />
+          <p v-if="token1">Balance: {{ token1Balance }}</p>
         </a-form-item>
       </a-col>
     </a-row>
@@ -256,6 +275,18 @@ export default {
     token1Amount() {
       return this.formValues.token1Amount || 0;
     },
+    token0Balance() {
+      if (!this.formValues.token0 || !this.tokens) return 0;
+
+      const token = this.tokens.find((token) => token.value === this.formValues.token0)
+      return token.balance
+    },
+    token1Balance() {
+      if (!this.formValues.token1 || !this.tokens) return 0;
+
+      const token = this.tokens.find((token) => token.value === this.formValues.token1)
+      return token.balance
+    },
     fee() {
       return this.formValues.fee
     },
@@ -268,6 +299,7 @@ export default {
           this.tokens = val?.tokens.map((token) => ({
             label: token.symbol,
             value: token.address.toUpperCase(),
+            balance: token.balance,
           }))
         }
         if (val && val.poolInfo && val.poolInfo !== this.poolInfo) {
@@ -321,6 +353,7 @@ export default {
     this.tokens = this.formData?.tokens.map((token) => ({
       label: token.symbol,
       value: token.address.toUpperCase(),
+      balance: token.balance,
     }))
   },
 
