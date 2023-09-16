@@ -96,9 +96,10 @@ export default {
     async getTokens() {
       try {
         this.loading = true
-        const origin = new URL(this.telegramQuery.url).origin
-        const tokens = await this.$axios
-        .$get(`${origin}/${origin.includes('ephrem') ? 'uniswap' : 'service'}/api/tokens`, {
+        const tokenUrl = this.telegramQuery.url
+        .replace('/api/uniswap/', '/api/accounts/')
+        .replace('/positions', '/tokens')
+        const tokens = await this.$axios.$get(tokenUrl, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: 'Bearer ' + this.telegramQuery.token,
