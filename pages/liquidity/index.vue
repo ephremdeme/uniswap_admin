@@ -52,6 +52,7 @@
       :allow-remove="true"
       :on-remove="handleRemove"
       :on-delete="handleDelete"
+      :on-collect="handleCollect"
     />
     <a-modal
       :visible="visible"
@@ -111,6 +112,7 @@ export default {
           dataIndex: 'id',
           key: 'ids',
           width: 90,
+          fixed: 'left'
         },
         {
           title: 'Pair',
@@ -118,6 +120,7 @@ export default {
           key: 'pair',
           scopedSlots: { customRender: 'tags' },
           width: 130,
+          fixed: 'left'
         },
         {
           title: 'Price',
@@ -148,6 +151,18 @@ export default {
           dataIndex: 'depositedToken1',
           key: 'depositedToken1',
           width: 130,
+        },
+        {
+          title: 'Low Price',
+          dataIndex: 'lowPrice',
+          key: 'lowPrice',
+          width: 90,
+        },
+        {
+          title: 'High Price',
+          dataIndex: 'highPrice',
+          key: 'highPrice',
+          width: 95,
         },
         {
           title: 'StopLow',
@@ -182,9 +197,10 @@ export default {
           width: 120,
         },
         {
-          title: 'Edit',
-          key: 'edit',
+          title: 'Action',
+          key: 'action',
           scopedSlots: { customRender: 'action' },
+          fixed: 'right',
           width: 320,
         },
       ],
@@ -292,6 +308,23 @@ export default {
         .post(`/api/uniswap/${this.wallet}/positions/${pos.id}/swap`, {
           slippage: pos.slippage,
           token: pos.token?.address || pos.token,
+        })
+        .then(() => {
+          this.getLiquidity(this.wallet)
+        })
+        .catch((e) => {
+          this.$message.error(e.message)
+        })
+        .finally(() => {
+          this.loading = false
+        })
+    },
+
+    handleCollect(pos) {
+      this.loading = true
+      this.$axios
+        .put(`/api/uniswap/${this.wallet}/positions/collect`, {
+          posId: pos.id,
         })
         .then(() => {
           this.getLiquidity(this.wallet)

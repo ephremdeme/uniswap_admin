@@ -33,8 +33,15 @@
         <a-button v-if="allowEdit" type="primary" @click="onEdit(record)"
           >Edit</a-button
         >
+
+        <a-button v-if="onCollect" type="default" @click="onCollect(record)"
+          >Collect Fees</a-button
+        >
+
         <a-button v-if="allowDelete" type="danger" @click="onDelete(record)"
-          >Delete</a-button
+          >
+          {{ allowRemove ? 'Remove' : 'Delete' }}
+          </a-button
         >
 
         <a-button
@@ -86,6 +93,10 @@ export default {
     onSubmit: {
       type: Function,
       default: () => {},
+    },
+    onCollect: {
+      type: Function,
+      default: null,
     },
     onRemove: {
       type: Function,
