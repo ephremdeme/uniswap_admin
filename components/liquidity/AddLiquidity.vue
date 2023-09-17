@@ -95,37 +95,53 @@
 
     <a-row :gutter="16">
       <a-col :span="11">
-        <a-form-item label="Stop Low">
+        <a-form-item label="Low Price">
           <a-input-number 
           v-decorator="[
-            'stopLow',
+            'lowPrice',
             {
               rules: [
                 {
                   required: true,
-                  message: 'Please input a stop low value',
+                  message: 'Please input a low price',
                 },
+                {
+                  validator: (rule, value, callback) => {
+                    if (value > price) {
+                      callback('Low Price must be less than price')
+                    }
+                    callback()
+                  },
+                }
               ],
             },
-          ]" :min="0" style="width: 100%" placeholder="Stop Low" :disabled="!(poolInfo && poolInfo.tick)"
-            @change="(ev) => handleOnChange(ev, 'stopLow')" />
+          ]" :min="0" style="width: 100%" placeholder="Low Price" :disabled="!(poolInfo && poolInfo.tick)"
+            @change="(ev) => handleOnChange(ev, 'lowPrice')" />
         </a-form-item>
       </a-col>
       <a-col :span="11">
-        <a-form-item label="Stop High">
+        <a-form-item label="High Price">
           <a-input-number
            v-decorator="[
-            'stopHigh',
+            'highPrice',
             {
               rules: [
                 {
                   required: true,
-                  message: 'Please input a stop high value',
+                  message: 'Please input a High Price value',
                 },
+                {
+                  validator: (rule, value, callback) => {
+                    if (value < price) {
+                      callback('High Price must be greater than price')
+                    }
+                    callback()
+                  },
+                }
               ],
             },
-          ]" :min="0" style="width: 100%" placeholder="Stop High" :disabled="!(poolInfo && poolInfo.tick)"
-            @change="(ev) => handleOnChange(ev, 'stopHigh')" />
+          ]" :min="0" style="width: 100%" placeholder="High Price" :disabled="!(poolInfo && poolInfo.tick)"
+            @change="(ev) => handleOnChange(ev, 'highPrice')" />
         </a-form-item>
       </a-col>
     </a-row>
@@ -186,6 +202,59 @@
       </a-col>
     </a-row>
 
+    <a-row :gutter="16">
+      <a-col :span="11">
+        <a-form-item label="Stop Low">
+          <a-input-number 
+          v-decorator="[
+            'stopLow',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input a stop low value',
+                },
+                {
+                  validator: (rule, value, callback) => {
+                    if (value > price) {
+                      callback('Stop Low must be less than price')
+                    }
+                    callback()
+                  },
+                }
+              ],
+            },
+          ]" :min="0" style="width: 100%" placeholder="Stop Low" :disabled="!(poolInfo && poolInfo.tick)"
+            @change="(ev) => handleOnChange(ev, 'stopLow')" />
+        </a-form-item>
+      </a-col>
+      <a-col :span="11">
+        <a-form-item label="Stop High">
+          <a-input-number
+           v-decorator="[
+            'stopHigh',
+            {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input a stop high value',
+                },
+                {
+                  validator: (rule, value, callback) => {
+                    if (value < price) {
+                      callback('Stop High must be greater than price')
+                    }
+                    callback()
+                  },
+                }
+              ],
+            },
+          ]" :min="0" style="width: 100%" placeholder="Stop High" :disabled="!(poolInfo && poolInfo.tick)"
+            @change="(ev) => handleOnChange(ev, 'stopHigh')" />
+        </a-form-item>
+      </a-col>
+    </a-row>
+
     <a-form-item>
       <a-button type="primary" html-type="submit" :loading="loading" :disabled="!(!isNaN(token0Amount) && token1Amount )">
         Submit
@@ -240,6 +309,8 @@ export default {
         fee: 3000,
         stopLow: null,
         stopHigh: null,
+        lowPrice: null,
+        highPrice: null,
       },
       poolInfo: null,
     }
@@ -247,15 +318,15 @@ export default {
 
   computed: {
     depositRatio() {
-      if (!this.poolInfo || !this.poolInfo.token0 || !this.formValues.stopHigh || isNaN(this.formValues.stopLow)) return NaN;
+      if (!this.poolInfo || !this.poolInfo.token0 || !this.formValues.highPrice || isNaN(this.formValues.lowPrice)) return NaN;
 
-      const ratio = getPositionTokensDepositRatio(this.price, this.formValues.stopLow, this.formValues.stopHigh)
+      const ratio = getPositionTokensDepositRatio(this.price, this.formValues.lowPrice, this.formValues.highPrice)
       return ratio
     },
     price() {
       if (!this.poolInfo || !this.poolInfo.price) return NaN;
 
-      return this.poolInfo.price
+      return +this.poolInfo.price
     },
     token0() {
       return this.formValues.token0
@@ -268,6 +339,12 @@ export default {
     },
     stopHigh() {
       return this.formValues.stopHigh
+    },
+    lowPrice() {
+      return this.formValues.lowPrice
+    },
+    highPrice() {
+      return this.formValues.highPrice
     },
     token0Amount() {
       return this.formValues.token0Amount || 0;
@@ -334,12 +411,12 @@ export default {
     price: {
       handler: function (val, oldVal) {
         if(val && val !== oldVal) {
-          this.formValues.stopLow = this.price * 0.90
-          this.formValues.stopHigh = this.price * 1.10
+          this.formValues.lowPrice = this.price * 0.90
+          this.formValues.highPrice = this.price * 1.10
 
           this.form.setFieldsValue({
-            stopLow: (this.price * 0.90),
-            stopHigh: (this.price * 1.10),
+            lowPrice: (this.price * 0.90),
+            highPrice: (this.price * 1.10),
           });
         }
         return val
@@ -386,16 +463,6 @@ export default {
         })
 
         this.formValues[name] = value
-        return
-      }
-
-      if(name === 'stopHigh' && this.price > value) {
-        this.$message.error('Stop High must be greater than price', 5)
-        this.form.setFieldsValue({
-          [name]: undefined,
-        })
-
-        this.formValues[name] = undefined
         return
       }
 
