@@ -200,13 +200,13 @@ export default {
           width: 120,
         },
         {
-          title: 'Collected Fee0',
+          title: 'Unclaimed Fee0',
           dataIndex: 'collectedFee0',
           key: 'collectedFee0',
           width: 190,
         },
         {
-          title: 'Collected Fee1',
+          title: 'Unclaimed Fee1',
           dataIndex: 'collectedFee1',
           key: 'collectedFee1',
           width: 190,
