@@ -64,6 +64,8 @@
         :is="AddLiquidity"
         :form-data="formData"
         :on-submit="handleSubmit"
+        :loading="loading"
+        @fetch-pool-info="fetchPoolInfo"
       />
     </a-modal>
   </div>
@@ -93,6 +95,7 @@ export default {
       visible: false,
       formData: {
         tokens: [],
+        poolInfo: null,
       },
       title: 'Mint Liquidity!',
 
@@ -221,6 +224,28 @@ export default {
     }
   },
 
+  watch: {
+    formData: {
+      handler: function (val, oldVal) {
+        if (val && oldVal && val.tokens !== oldVal.tokens) {
+          this.formData = val
+        }
+
+        if (val && oldVal && val.poolInfo !== oldVal.poolInfo) {
+          this.formData = val
+        }
+      },
+    },
+
+    wallet: {
+      handler: function (val, oldVal) {
+        if (val && oldVal && val !== oldVal) {
+          this.getTokens()
+        }
+      },
+    },
+  },
+
   mounted() {
     this.form.setFieldsValue({
       wallet: this.wallets[0]?._id,
@@ -267,12 +292,31 @@ export default {
 
     async getTokens() {
       this.loading = true
-      const tokens = await this.$axios.get(`/api/tokens`).catch((e) => {
+      const tokens = await this.$axios.get(`/api/accounts/${this.wallet}/tokens`).catch((e) => {
         this.$message.error(e.message)
         return { data: [] }
       })
       this.formData.tokens = tokens.data
       this.loading = false
+    },
+
+    async fetchPoolInfo(values) {
+      const { fee, token0, token1 } = values
+
+      const poolInfo = await this.$axios
+        .post(`/api/uniswap/poolInfo`,
+          {
+            token0,
+            token1,
+            fee,
+          },
+        )
+        .catch((e) => {
+          this.$message.error(e.message)
+          return {}
+        })
+      this.loading = false
+      this.formData.poolInfo = poolInfo.data
     },
 
     async handleSubmit(values) {
@@ -291,6 +335,8 @@ export default {
             values
           )
         }
+        this.$message.success('Position updated successfully')
+        this.visible = false
         await this.getLiquidity(this.wallet)
       } catch (error) {
         this.$message.error(error.message)
