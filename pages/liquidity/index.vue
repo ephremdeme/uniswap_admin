@@ -168,19 +168,19 @@ export default {
           title: 'StopLow',
           dataIndex: 'stopLow',
           key: 'stopLow',
-          width: 90,
+          width: 100,
         },
         {
           title: 'StopHigh',
           dataIndex: 'stopHigh',
           key: 'stopHigh',
-          width: 95,
+          width: 100,
         },
         {
           title: 'Slippage',
           dataIndex: 'slippage',
           key: 'slippage',
-          width: 90,
+          width: 95,
         },
         {
           title: 'Token Low',
@@ -195,6 +195,18 @@ export default {
           key: 'tokenHigh',
           scopedSlots: { customRender: 'tags' },
           width: 120,
+        },
+        {
+          title: 'Collected Fee0',
+          dataIndex: 'collectedFee0',
+          key: 'collectedFee0',
+          width: 190,
+        },
+        {
+          title: 'Collected Fee1',
+          dataIndex: 'collectedFee1',
+          key: 'collectedFee1',
+          width: 190,
         },
         {
           title: 'Action',
@@ -323,7 +335,7 @@ export default {
     handleCollect(pos) {
       this.loading = true
       this.$axios
-        .put(`/api/uniswap/${this.wallet}/positions/collect`, {
+        .put(`/api/uniswap/${this.wallet}/positions/${pos.id}/fee`, {
           posId: pos.id,
         })
         .then(() => {
