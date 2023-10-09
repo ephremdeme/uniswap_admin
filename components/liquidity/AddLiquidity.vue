@@ -2,7 +2,7 @@
   <a-form :form="form" :layout="layout" @submit="handleSubmit">
     <a-row :gutter="16">
       <a-col :span="11">
-        <a-form-item label="Token" >
+        <a-form-item label="Token 0" >
           <a-select 
           v-decorator="[
             'token0',
@@ -24,7 +24,7 @@
         </a-form-item>
       </a-col>
       <a-col :span="11">
-        <a-form-item label="Token">
+        <a-form-item label="Token 1">
           <a-select 
           v-decorator="[
             'token1',
@@ -115,7 +115,7 @@
                 }
               ],
             },
-          ]" :min="0" style="width: 100%" placeholder="Low Price" :disabled="!(poolInfo && poolInfo.tick)"
+          ]" :min="0" style="width: 100%" placeholder="Low Price" :disabled="!(poolInfo && poolInfo.fee)"
             @change="(ev) => handleOnChange(ev, 'lowPrice')" />
         </a-form-item>
       </a-col>
@@ -140,7 +140,7 @@
                 }
               ],
             },
-          ]" :min="0" style="width: 100%" placeholder="High Price" :disabled="!(poolInfo && poolInfo.tick)"
+          ]" :min="0" style="width: 100%" placeholder="High Price" :disabled="!(poolInfo && poolInfo.fee)"
             @change="(ev) => handleOnChange(ev, 'highPrice')" />
         </a-form-item>
       </a-col>
@@ -452,25 +452,30 @@ export default {
     },
 
     handleOnChange(value, name) {
-      if (name === 'token0' && value === this.token1 || name === 'token1' && value === this.token0) {
-        this.$message.error('Token0 and Token1 must be different', 5)
-        this.form.setFieldsValue({
-          [name === 'token0' ? 'token1' : 'token0']: undefined,
-        })
-        this.formValues[name === 'token0' ? 'token1' : 'token0'] = undefined
-        this.form.setFieldsValue({
-          [name]: value,
-        })
-
-        this.formValues[name] = value
-        return
-      }
-
       this.form.setFieldsValue({
         [name]: value,
       })
-
       this.formValues[name] = value
+
+      if (name === 'token0') {
+        if (value === this.form.getFieldValue('token1')) {
+          this.formValues.token1 = null
+          this.form.setFieldsValue({
+            token1: null,
+          })
+          return;          
+        }
+      }
+
+      if (name === 'token1') {
+        if (value === this.form.getFieldValue('token0')) {
+          this.formValues.token0 = null
+          this.form.setFieldsValue({
+            token0: null,
+          })
+          return;
+        }
+      }
 
       if (name === 'token0Amount') {
         this.formValues.token1Amount = +(this.token0Amount * this.depositRatio)
@@ -488,11 +493,8 @@ export default {
 
       if (name === 'fee' || name === 'token0' || name === 'token1') {
         if (
-          this.token0 &&
-          !Array.isArray(this.token0) &&
-          this.token1 &&
-          !Array.isArray(this.token1) &&
-          this.fee
+          this.token0 && this.token1 &&
+          this.fee && this.token0 !== this.token1
         ) {
           this.$emit('fetch-pool-info', {
             token0: this.token0,

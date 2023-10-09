@@ -142,7 +142,7 @@ export default {
           return {}
         })
       this.loading = false
-      this.formData.poolInfo = poolInfo.data
+      this.formData.poolInfo = poolInfo.data || poolInfo
     },
   },
 }
