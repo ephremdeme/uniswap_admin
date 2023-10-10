@@ -1,6 +1,9 @@
 <template>
   <a-form :form="form" :layout="layout" @submit="handleSubmit">
     <a-row>
+      <a-col style="margin: 8px; margin-top: 3px;">
+        <div v-if="!isNaN(price)">Price: {{ price }}</div>
+      </a-col>
       <a-col :span="10">
         <a-form-item label="Deposited0">
           <a-input-number
@@ -199,6 +202,7 @@ export default {
       layout: 'vertical',
       placeholder: 'Select a token',
       tokens: [],
+      price: 0,
     }
   },
 
@@ -225,6 +229,8 @@ export default {
             depositedToken0: val.depositedToken0,
             depositedToken1: val.depositedToken1,
           })
+
+          this.price = val.currentPrice;
         }
         if (!val || !val.tokenLow || !val.tokenHigh) {
           this.form.resetFields()
@@ -258,6 +264,9 @@ export default {
       depositedToken0: this.formData?.depositedToken0,
       depositedToken1: this.formData?.depositedToken1,
     })
+
+    this.price = this.formData?.currentPrice;
+
   },
 
   unmounted() {
