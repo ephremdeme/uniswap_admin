@@ -65,6 +65,7 @@
         :form-data="formData"
         :on-submit="handleSubmit"
         :loading="loading"
+        :visible="visible"
         @fetch-pool-info="fetchPoolInfo"
       />
     </a-modal>
@@ -224,27 +225,6 @@ export default {
     }
   },
 
-  watch: {
-    formData: {
-      handler: function (val, oldVal) {
-        if (val && oldVal && val.tokens !== oldVal.tokens) {
-          this.formData = val
-        }
-
-        if (val && oldVal && val.poolInfo !== oldVal.poolInfo) {
-          this.formData = val
-        }
-      },
-    },
-
-    wallet: {
-      handler: function (val, oldVal) {
-        if (val && oldVal && val !== oldVal) {
-          this.getTokens()
-        }
-      },
-    },
-  },
 
   mounted() {
     this.form.setFieldsValue({
@@ -270,16 +250,17 @@ export default {
       if (this.wallet === value) return
       this.wallet = value
       this.getLiquidity(value)
+      this.getTokens();
     },
 
     async getLiquidity(id) {
       this.loading = true
       const liquidity = await this.$axios
-        .get(`/api/uniswap/${id}/positions`)
-        .catch((e) => {
-          this.$message.error(e.message)
-          return { data: [] }
-        })
+      .get(`/api/uniswap/${id}/positions`)
+      .catch((e) => {
+      this.$message.error(e.message)
+      return { data: [] }
+      })
       this.liquidity = liquidity.data.map((l) => {
         return {
           ...l,
@@ -397,7 +378,6 @@ export default {
 
     handleCancel() {
       this.visible = false
-      this.formData = {}
     },
   },
 }

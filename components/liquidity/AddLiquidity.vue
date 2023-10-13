@@ -288,9 +288,13 @@ export default {
     },
     formData: {
       type: Object,
-      default: () => { },
+      default: Object,
     },
     loading: {
+      type: Boolean,
+      default: false,
+    },
+    visible: {
       type: Boolean,
       default: false,
     },
@@ -353,13 +357,13 @@ export default {
       return this.formValues.token1Amount || 0;
     },
     token0Balance() {
-      if (!this.formValues.token0 || !this.tokens) return 0;
+      if (!this.formValues.token0 || !this.tokens.length) return 0;
 
       const token = this.tokens.find((token) => token.value === this.formValues.token0)
       return token.balance
     },
     token1Balance() {
-      if (!this.formValues.token1 || !this.tokens) return 0;
+      if (!this.formValues.token1 || !this.tokens.length) return 0;
 
       const token = this.tokens.find((token) => token.value === this.formValues.token1)
       return token.balance
@@ -389,7 +393,7 @@ export default {
     },
     depositRatio: {
       handler: function (val, oldVal) {
-        if(val && val !== oldVal) {
+        if(val && val !== oldVal && this.formValues.token0) {
 
           if(!this.token0Amount) {
             this.formValues.token0Amount = 1
@@ -410,7 +414,7 @@ export default {
     },
     price: {
       handler: function (val, oldVal) {
-        if(val && val !== oldVal) {
+        if(val && val !== oldVal && this.formValues.token0) {
           this.formValues.lowPrice = this.price * 0.90
           this.formValues.highPrice = this.price * 1.10
 
@@ -424,6 +428,15 @@ export default {
       deep: true,
       immediate: true,
     },
+    visible: {
+      handler: function (val, oldVal) {
+        if(!val) 
+          this.resetForm();
+      return val
+    },
+      deep: true,
+      immediate: true,
+    }
   },
 
   mounted() {
@@ -506,7 +519,19 @@ export default {
     },
 
     resetForm() {
-      this.form.resetFields()
+      this.form.resetFields();
+      this.formValues = {
+        token0: null,
+        token1: null,
+        token0Amount: 0,
+        token1Amount: 0,
+        fee: 3000,
+        stopLow: 0,
+        stopHigh: 0,
+        lowPrice: 0,
+        highPrice: 0,
+      }
+      this.poolInfo = null;
     },
   },
 }
