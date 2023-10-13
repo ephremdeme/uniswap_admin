@@ -187,7 +187,7 @@
                 },
                 {
                   validator: (rule, value, callback) => {
-                    if (value > token0Balance) {
+                    if (value > token1Balance) {
                       callback('Insufficient balance')
                     }
                     callback()
