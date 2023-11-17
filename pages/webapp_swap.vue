@@ -17,6 +17,7 @@ export default {
     components: {
         SwapComponent,
     },
+    auth: false,
     layout: 'bot',
 
     data() {
