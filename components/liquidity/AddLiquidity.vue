@@ -2,9 +2,9 @@
   <a-form :form="form" :layout="layout" @submit="handleSubmit">
     <a-row :gutter="16">
       <a-col :span="11">
-        <a-form-item label="Token 0" >
-          <a-select 
-          v-decorator="[
+        <a-form-item label="Token 0">
+          <a-select
+v-decorator="[
             'token0',
             {
               rules: [
@@ -16,7 +16,8 @@
               initialValue: undefined,
               valuePropName: 'value',
             },
-          ]"     show-search placeholder="Select a Token0"     option-filter-prop="children" @change="(val) => handleOnChange(val, 'token0')">
+          ]" show-search placeholder="Select a Token0" option-filter-prop="children"
+            @change="(val) => handleOnChange(val, 'token0')">
             <a-select-option v-for="token in tokens" :key="token.value" :value="token.value">
               {{ token.label }}
             </a-select-option>
@@ -25,8 +26,8 @@
       </a-col>
       <a-col :span="11">
         <a-form-item label="Token 1">
-          <a-select 
-          v-decorator="[
+          <a-select
+v-decorator="[
             'token1',
             {
               rules: [
@@ -38,7 +39,8 @@
               initialValue: undefined,
               valuePropName: 'value',
             },
-          ]"     show-search     option-filter-prop="children" placeholder="Select a Token1" @change="(val) => handleOnChange(val, 'token1')">
+          ]" show-search option-filter-prop="children" placeholder="Select a Token1"
+            @change="(val) => handleOnChange(val, 'token1')">
             <a-select-option v-for="token in tokens" :key="token.value" :value="token.value">
               {{ token.label }}
             </a-select-option>
@@ -50,8 +52,8 @@
     <a-row :gutter="17">
       <a-col :span="11">
         <a-form-item label="Slippage">
-          <a-input-number 
-          v-decorator="[
+          <a-input-number
+v-decorator="[
             'slippage',
             {
               rules: [
@@ -69,8 +71,8 @@
       </a-col>
       <a-col :span="11">
         <a-form-item label="Fee">
-          <a-radio-group 
-          v-decorator="[
+          <a-radio-group
+v-decorator="[
             'fee',
             {
               rules: [
@@ -81,7 +83,8 @@
               ],
               initialValue: 3000,
             },
-          ]" name="fee" style="width: 100%; display: flex; flex-wrap: wrap;" @change="(ev) => handleOnChange(ev.target.value, 'fee')">
+          ]" name="fee" style="width: 100%; display: flex; flex-wrap: wrap;"
+            @change="(ev) => handleOnChange(ev.target.value, 'fee')">
             <a-radio :value="100"> 0.01% </a-radio>
             <a-radio :value="500"> 0.05% </a-radio>
             <a-radio :value="3000"> 0.3% </a-radio>
@@ -90,14 +93,14 @@
         </a-form-item>
       </a-col>
     </a-row>
-<!-- display price using a simple div or p -->
+    <!-- display price using a simple div or p -->
     <div v-if="!isNaN(price || poolInfo?.price)">Price: {{ price }}</div>
 
     <a-row :gutter="16">
       <a-col :span="11">
         <a-form-item label="Low Price">
-          <a-input-number 
-          v-decorator="[
+          <a-input-number
+v-decorator="[
             'lowPrice',
             {
               rules: [
@@ -122,7 +125,7 @@
       <a-col :span="11">
         <a-form-item label="High Price">
           <a-input-number
-           v-decorator="[
+v-decorator="[
             'highPrice',
             {
               rules: [
@@ -149,8 +152,8 @@
     <a-row :gutter="16">
       <a-col :span="11">
         <a-form-item label="Token 0 Amount">
-          <a-input-number 
-          v-decorator="[
+          <a-input-number
+v-decorator="[
             'token0Amount',
             {
               rules: [
@@ -168,16 +171,16 @@
                 }
               ],
             },
-          ]" placeholder="Token0 Amount" :min="0"  :step="10" :disabled="isNaN(depositRatio)" style="width: 100%"
-            @change="(ev) => handleOnChange(ev, 'token0Amount')" />
+          ]" placeholder="Token0 Amount" :min="0" :step="10" :disabled="!(poolInfo && poolInfo.fee)"
+            style="width: 100%" @change="(ev) => handleOnChange(ev, 'token0Amount')" />
           <!-- display balance here like uniswap liquidity add page using helper text -->
           <p v-if="token0">Balance: {{ token0Balance }}</p>
         </a-form-item>
       </a-col>
       <a-col :span="11">
         <a-form-item label="Token 1 Amount">
-          <a-input-number 
-          v-decorator="[
+          <a-input-number
+v-decorator="[
             'token1Amount',
             {
               rules: [
@@ -195,8 +198,8 @@
                 }
               ],
             },
-          ]" :min="0" :step="10" :disabled="isNaN(depositRatio)" style="width: 100%" placeholder="Token1 Amount"
-            @change="(ev) => handleOnChange(ev, 'token1Amount')" />
+          ]" :min="0" :step="10" :disabled="!(poolInfo && poolInfo.fee)" style="width: 100%"
+            placeholder="Token1 Amount" @change="(ev) => handleOnChange(ev, 'token1Amount')" />
           <p v-if="token1">Balance: {{ token1Balance }}</p>
         </a-form-item>
       </a-col>
@@ -205,8 +208,8 @@
     <a-row :gutter="16">
       <a-col :span="11">
         <a-form-item label="Stop Low">
-          <a-input-number 
-          v-decorator="[
+          <a-input-number
+v-decorator="[
             'stopLow',
             {
               rules: [
@@ -231,7 +234,7 @@
       <a-col :span="11">
         <a-form-item label="Stop High">
           <a-input-number
-           v-decorator="[
+v-decorator="[
             'stopHigh',
             {
               rules: [
@@ -256,7 +259,7 @@
     </a-row>
 
     <a-form-item>
-      <a-button type="primary" html-type="submit" :loading="loading" :disabled="!(!isNaN(token0Amount) && token1Amount )">
+      <a-button type="primary" html-type="submit" :loading="loading" :disabled="!(!isNaN(token0Amount) && token1Amount)">
         Submit
       </a-button>
       <a-button style="margin-left: 8px" :disabled="loading" :loading="loading" @click="resetForm">
@@ -268,7 +271,7 @@
 
 <script>
 import { Form, Select, InputNumber, Button, Radio } from 'ant-design-vue'
-import { getPositionTokensDepositRatio } from '../../utils/math'
+import { getPositionTokensDepositRatio, calculatePl, calculatePu } from '../../utils/math'
 
 export default {
   name: 'NuxtAddLiquidity',
@@ -322,7 +325,7 @@ export default {
 
   computed: {
     depositRatio() {
-      if (!this.poolInfo || !this.poolInfo.token0 || !this.formValues.highPrice || isNaN(this.formValues.lowPrice)) return NaN;
+      if (!this.poolInfo || !this.poolInfo.token0 || isNaN(this.formValues.highPrice) || this.formValues.highPrice < this.price || isNaN(this.formValues.lowPrice) || this.formValues.lowPrice > this.price || this.lowPrice === null || this.highPrice === null) return NaN;
 
       const ratio = getPositionTokensDepositRatio(this.price, this.formValues.lowPrice, this.formValues.highPrice)
       return ratio
@@ -393,9 +396,9 @@ export default {
     },
     depositRatio: {
       handler: function (val, oldVal) {
-        if(val && val !== oldVal && this.formValues.token0) {
+        if (val && val !== oldVal && this.formValues.token0) {
 
-          if(!this.token0Amount) {
+          if (!this.token0Amount) {
             this.formValues.token0Amount = 1
             this.form.setFieldsValue({
               token0Amount: 1,
@@ -412,28 +415,12 @@ export default {
       deep: true,
       immediate: true,
     },
-    price: {
-      handler: function (val, oldVal) {
-        if(val && val !== oldVal && this.formValues.token0) {
-          this.formValues.lowPrice = this.price * 0.90
-          this.formValues.highPrice = this.price * 1.10
-
-          this.form.setFieldsValue({
-            lowPrice: (this.price * 0.90),
-            highPrice: (this.price * 1.10),
-          });
-        }
-        return val
-      },
-      deep: true,
-      immediate: true,
-    },
     visible: {
       handler: function (val, oldVal) {
-        if(!val) 
+        if (!val)
           this.resetForm();
-      return val
-    },
+        return val
+      },
       deep: true,
       immediate: true,
     }
@@ -476,7 +463,7 @@ export default {
           this.form.setFieldsValue({
             token1: null,
           })
-          return;          
+          return;
         }
       }
 
@@ -490,18 +477,42 @@ export default {
         }
       }
 
-      if (name === 'token0Amount') {
-        this.formValues.token1Amount = +(this.token0Amount * this.depositRatio)
-        this.form.setFieldsValue({
-          token1Amount: +(this.token0Amount * this.depositRatio).toFixed(4),
-        })
-      }
+      if (name === 'highPrice' || name === 'lowPrice' || name === 'token0Amount' || name === 'token1Amount') {
+        if (!this.formValues.lowPrice && this.formValues.highPrice && this.formValues.highPrice >= this.price && this.formValues.token0Amount && this.formValues.token1Amount) {
+          const lowPrice = +calculatePl(this.price, this.formValues.highPrice, this.formValues.token0Amount, this.formValues.token1Amount).toFixed(4)
+          if (lowPrice < this.price) {
+            this.formValues.lowPrice = lowPrice
+            this.form.setFieldsValue({
+              lowPrice,
+            })
+          }
+        }
 
-      if (name === 'token1Amount') {
-        this.formValues.token0Amount = +(this.token1Amount / this.depositRatio)
-        this.form.setFieldsValue({
-          token0Amount: +(this.token1Amount / this.depositRatio).toFixed(4),
-        })
+        if (!this.formValues.highPrice && this.formValues.lowPrice && this.formValues.lowPrice <= this.price && this.formValues.token0Amount && this.formValues.token1Amount) {
+
+          const highPrice = +calculatePu(this.price, this.formValues.lowPrice, this.formValues.token0Amount, this.formValues.token1Amount).toFixed(4);
+          if (highPrice > this.price) {
+            this.formValues.highPrice = highPrice
+            this.form.setFieldsValue({
+              highPrice,
+            })
+          }
+        }
+
+        if (this.depositRatio && Number.isFinite(this.depositRatio)) {
+          if (name === 'token0Amount') {
+            this.formValues.token1Amount = +(this.token0Amount * this.depositRatio)
+            this.form.setFieldsValue({
+              token1Amount: +(this.token0Amount * this.depositRatio).toFixed(4),
+            })
+          }
+          if (name === 'token1Amount') {
+            this.formValues.token0Amount = +(this.token1Amount / this.depositRatio)
+            this.form.setFieldsValue({
+              token0Amount: +(this.token1Amount / this.depositRatio).toFixed(4),
+            })
+          }
+        }
       }
 
       if (name === 'fee' || name === 'token0' || name === 'token1') {
