@@ -59,7 +59,25 @@ const getPositionTokensDepositRatio = (
     return deltaY / deltaX;
 };
 
-export {
+const calculatePl = (P, Pu, x, y)=>{
+    const sp = Math.sqrt(P);
+    const sb = Math.sqrt(Pu);
+
+    const sa =( y / (sb * x)) + sp - (y / (sp * x))  // from eq(16) in Tech Note
+    return sa ** 2
+}
+
+const calculatePu = (P, Pl, x, y)=>{
+    const sp = Math.sqrt(P);
+    const sa = Math.sqrt(Pl);
+
+    const sb  = (sp * y)/((sa * sp * x) - (P * x) + y) // from eq(17) in Tech Note
+    return sb ** 2
+}
+
+module.exports= {
     getPositionTokensDepositRatio,
     getPriceFromTick,
+    calculatePl,
+    calculatePu
 }
