@@ -96,9 +96,12 @@ v-decorator="[
     <!-- display price using a simple div or p -->
     <div v-if="!isNaN(price || poolInfo?.price)">Price: {{ price }}</div>
 
+  <a-radio-group v-model="formValues.active" :disabled="!(poolInfo && poolInfo.fee)" @change="handleOnChange($event.target.value, 'active')">
+
     <a-row :gutter="16">
       <a-col :span="11">
-        <a-form-item label="Low Price">
+        <a-radio value="lowPriceRadio">Low Price</a-radio>
+        <a-form-item>
           <a-input-number
 v-decorator="[
             'lowPrice',
@@ -118,12 +121,13 @@ v-decorator="[
                 }
               ],
             },
-          ]" :min="0" style="width: 100%" placeholder="Low Price" :disabled="!(poolInfo && poolInfo.fee)"
+          ]" :min="0" style="width: 100%" placeholder="Low Price" :disabled="!(poolInfo && poolInfo.fee) || activeValue === 'lowPriceRadio'"
             @change="(ev) => handleOnChange(ev, 'lowPrice')" />
         </a-form-item>
       </a-col>
       <a-col :span="11">
-        <a-form-item label="High Price">
+        <a-radio value="highPriceRadio">High Price</a-radio>
+        <a-form-item>
           <a-input-number
 v-decorator="[
             'highPrice',
@@ -143,7 +147,7 @@ v-decorator="[
                 }
               ],
             },
-          ]" :min="0" style="width: 100%" placeholder="High Price" :disabled="!(poolInfo && poolInfo.fee)"
+          ]" :min="0" style="width: 100%" placeholder="High Price" :disabled="!(poolInfo && poolInfo.fee) || activeValue === 'highPriceRadio'"
             @change="(ev) => handleOnChange(ev, 'highPrice')" />
         </a-form-item>
       </a-col>
@@ -151,7 +155,8 @@ v-decorator="[
 
     <a-row :gutter="16">
       <a-col :span="11">
-        <a-form-item label="Token 0 Amount">
+        <a-radio value="token0AmountRadio">Token 0 Amount</a-radio>
+        <a-form-item>
           <a-input-number
 v-decorator="[
             'token0Amount',
@@ -171,14 +176,15 @@ v-decorator="[
                 }
               ],
             },
-          ]" placeholder="Token0 Amount" :min="0" :step="10" :disabled="!(poolInfo && poolInfo.fee)"
+          ]" placeholder="Token0 Amount" :min="0" :step="10" :disabled="!(poolInfo && poolInfo.fee) || activeValue === 'token0AmountRadio'"
             style="width: 100%" @change="(ev) => handleOnChange(ev, 'token0Amount')" />
           <!-- display balance here like uniswap liquidity add page using helper text -->
           <p v-if="token0">Balance: {{ token0Balance }}</p>
         </a-form-item>
       </a-col>
       <a-col :span="11">
-        <a-form-item label="Token 1 Amount">
+        <a-radio value="token1AmountRadio">Token 1 Amount</a-radio>
+        <a-form-item>
           <a-input-number
 v-decorator="[
             'token1Amount',
@@ -198,12 +204,13 @@ v-decorator="[
                 }
               ],
             },
-          ]" :min="0" :step="10" :disabled="!(poolInfo && poolInfo.fee)" style="width: 100%"
-            placeholder="Token1 Amount" @change="(ev) => handleOnChange(ev, 'token1Amount')" />
+          ]" :min="0" :step="10" :disabled="!(poolInfo && poolInfo.fee) || activeValue === 'token1AmountRadio'"
+          style="width: 100%" placeholder="Token1 Amount" @change="(ev) => handleOnChange(ev, 'token1Amount')" />
           <p v-if="token1">Balance: {{ token1Balance }}</p>
         </a-form-item>
       </a-col>
     </a-row>
+  </a-radio-group>
 
     <a-row :gutter="16">
       <a-col :span="11">
@@ -318,6 +325,7 @@ export default {
         stopHigh: null,
         lowPrice: null,
         highPrice: null,
+        active: 'token1AmountRadio'
       },
       poolInfo: null,
     }
@@ -374,6 +382,9 @@ export default {
     fee() {
       return this.formValues.fee
     },
+    activeValue() {
+      return this.formValues.active
+    },
   },
 
   watch: {
@@ -394,27 +405,6 @@ export default {
       deep: true,
       immediate: true,
     },
-    depositRatio: {
-      handler: function (val, oldVal) {
-        if (val && val !== oldVal && this.formValues.token0) {
-
-          if (!this.token0Amount) {
-            this.formValues.token0Amount = 1
-            this.form.setFieldsValue({
-              token0Amount: 1,
-            })
-          }
-
-          this.formValues.token1Amount = (this.token0Amount || 1) * this.depositRatio
-          this.form.setFieldsValue({
-            token1Amount: ((this.token0Amount || 1) * this.depositRatio),
-          })
-        }
-        return val
-      },
-      deep: true,
-      immediate: true,
-    },
     visible: {
       handler: function (val, oldVal) {
         if (!val)
@@ -423,7 +413,7 @@ export default {
       },
       deep: true,
       immediate: true,
-    }
+    },
   },
 
   mounted() {
@@ -449,6 +439,67 @@ export default {
           })
         }
       })
+    },
+
+    calculateLowPrice() {
+      if (this.formValues.highPrice && this.formValues.highPrice >= this.price && this.formValues.token0Amount && this.formValues.token1Amount) {
+        const lowPrice = +calculatePl(this.price, this.formValues.highPrice, this.formValues.token0Amount, this.formValues.token1Amount).toFixed(4);
+        if (lowPrice < this.price) {
+          this.formValues.lowPrice = lowPrice
+          this.form.setFieldsValue({
+            lowPrice,
+          })
+        }
+      }
+      return 0
+    },
+
+    calculateHighPrice() {
+      if (this.formValues.lowPrice && this.formValues.lowPrice <= this.price && this.formValues.token0Amount && this.formValues.token1Amount) {
+        const highPrice = +calculatePu(this.price, this.formValues.lowPrice, this.formValues.token0Amount, this.formValues.token1Amount).toFixed(4);
+        if (highPrice > this.price) {
+          this.formValues.highPrice = highPrice
+          this.form.setFieldsValue({
+            highPrice,
+          })
+        }
+      }
+      return 0
+    },
+
+    calculateToken1Amount() {
+      if (this.depositRatio && Number.isFinite(this.depositRatio)) {
+        this.formValues.token1Amount = +(this.token0Amount * this.depositRatio)
+        this.form.setFieldsValue({
+          token1Amount: +(this.token0Amount * this.depositRatio).toFixed(4),
+        })
+      }
+      return 0
+    },
+
+    calculateToken0Amount() {
+      if (this.depositRatio && Number.isFinite(this.depositRatio)) {
+        this.formValues.token0Amount = +(this.token1Amount / this.depositRatio)
+        this.form.setFieldsValue({
+          token0Amount: +(this.token1Amount / this.depositRatio).toFixed(4),
+        })
+      }
+      return 0
+    },
+
+    checkActive(value) {
+      if ((this.activeValue  || value)=== 'lowPriceRadio') {
+        this.calculateLowPrice()
+      }
+      if ((this.activeValue  || value)=== 'highPriceRadio') {
+        this.calculateHighPrice()
+      }
+      if ((this.activeValue  || value)=== 'token0AmountRadio') {
+        this.calculateToken0Amount()
+      }
+      if ((this.activeValue  || value)=== 'token1AmountRadio') {
+        this.calculateToken1Amount()
+      }
     },
 
     handleOnChange(value, name) {
@@ -477,42 +528,11 @@ export default {
         }
       }
 
+      if (name === 'active')
+        this.checkActive(value)
+
       if (name === 'highPrice' || name === 'lowPrice' || name === 'token0Amount' || name === 'token1Amount') {
-        if (!this.formValues.lowPrice && this.formValues.highPrice && this.formValues.highPrice >= this.price && this.formValues.token0Amount && this.formValues.token1Amount) {
-          const lowPrice = +calculatePl(this.price, this.formValues.highPrice, this.formValues.token0Amount, this.formValues.token1Amount).toFixed(4)
-          if (lowPrice < this.price) {
-            this.formValues.lowPrice = lowPrice
-            this.form.setFieldsValue({
-              lowPrice,
-            })
-          }
-        }
-
-        if (!this.formValues.highPrice && this.formValues.lowPrice && this.formValues.lowPrice <= this.price && this.formValues.token0Amount && this.formValues.token1Amount) {
-
-          const highPrice = +calculatePu(this.price, this.formValues.lowPrice, this.formValues.token0Amount, this.formValues.token1Amount).toFixed(4);
-          if (highPrice > this.price) {
-            this.formValues.highPrice = highPrice
-            this.form.setFieldsValue({
-              highPrice,
-            })
-          }
-        }
-
-        if (this.depositRatio && Number.isFinite(this.depositRatio)) {
-          if (name === 'token0Amount') {
-            this.formValues.token1Amount = +(this.token0Amount * this.depositRatio)
-            this.form.setFieldsValue({
-              token1Amount: +(this.token0Amount * this.depositRatio).toFixed(4),
-            })
-          }
-          if (name === 'token1Amount') {
-            this.formValues.token0Amount = +(this.token1Amount / this.depositRatio)
-            this.form.setFieldsValue({
-              token0Amount: +(this.token1Amount / this.depositRatio).toFixed(4),
-            })
-          }
-        }
+        this.checkActive()
       }
 
       if (name === 'fee' || name === 'token0' || name === 'token1') {
@@ -541,6 +561,7 @@ export default {
         stopHigh: 0,
         lowPrice: 0,
         highPrice: 0,
+        active: 'token1AmountRadio'
       }
       this.poolInfo = null;
     },
