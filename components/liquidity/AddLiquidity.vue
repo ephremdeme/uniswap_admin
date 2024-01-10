@@ -122,7 +122,7 @@ v-decorator="[
               ],
             },
           ]" :min="0" style="width: 100%" placeholder="Low Price" :disabled="!(poolInfo && poolInfo.fee) || activeValue === 'lowPriceRadio'"
-            @change="(ev) => handleOnChange(ev, 'lowPrice')" />
+            @change="(ev) => handleOnChange(ev, 'lowPrice')" @blur="handleOnFocusChange('lowPrice')" />
         </a-form-item>
       </a-col>
       <a-col :span="11">
@@ -148,7 +148,7 @@ v-decorator="[
               ],
             },
           ]" :min="0" style="width: 100%" placeholder="High Price" :disabled="!(poolInfo && poolInfo.fee) || activeValue === 'highPriceRadio'"
-            @change="(ev) => handleOnChange(ev, 'highPrice')" />
+            @change="(ev) => handleOnChange(ev, 'highPrice')" @blur="handleOnFocusChange('highPrice')" />
         </a-form-item>
       </a-col>
     </a-row>
@@ -205,7 +205,7 @@ v-decorator="[
               ],
             },
           ]" :min="0" :step="10" :disabled="!(poolInfo && poolInfo.fee) || activeValue === 'token1AmountRadio'"
-          style="width: 100%" placeholder="Token1 Amount" @change="(ev) => handleOnChange(ev, 'token1Amount')" />
+          style="width: 100%" placeholder="Token1 Amount" @change="(ev) => handleOnChange(ev, 'token1Amount')" @blur="calculateToken1Amount()"/>
           <p v-if="token1">Balance: {{ token1Balance }}</p>
         </a-form-item>
       </a-col>
@@ -278,7 +278,7 @@ v-decorator="[
 
 <script>
 import { Form, Select, InputNumber, Button, Radio } from 'ant-design-vue'
-import { getPositionTokensDepositRatio, calculatePl, calculatePu } from '../../utils/math'
+import { getPositionTokensDepositRatio, calculatePl, calculatePu, calculateNearestPrice } from '../../utils/math'
 
 export default {
   name: 'NuxtAddLiquidity',
@@ -395,6 +395,7 @@ export default {
             label: token.symbol,
             value: token.address.toUpperCase(),
             balance: token.balance,
+            decimals: token.decimals,
           }))
         }
         if (val && val.poolInfo && val.poolInfo !== this.poolInfo) {
@@ -421,6 +422,7 @@ export default {
       label: token.symbol,
       value: token.address.toUpperCase(),
       balance: token.balance,
+      decimals: token.decimals,
     }))
   },
 
@@ -441,28 +443,38 @@ export default {
       })
     },
 
+    handlePriceChange(value) {
+      if(!value || isNaN(value)) return 0;
+      const token = this.tokens.find((token) => token.value === this.formValues.token0)
+      const token1 = this.tokens.find((token) => token.value === this.formValues.token1)
+      if (!token || !token1) return 0;
+      const price = calculateNearestPrice(value, this.poolInfo, 
+      token.decimals === this.poolInfo.token0.decimals && this.poolInfo.tick > 0 ? token.decimals: token1.decimals,
+      token1.decimals === this.poolInfo.token1.decimals && this.poolInfo.tick > 0 ? token1.decimals: token.decimals);
+
+      return +price.toFixed(4)
+    },
+
     calculateLowPrice() {
       if (this.formValues.highPrice && this.formValues.highPrice >= this.price && this.formValues.token0Amount && this.formValues.token1Amount) {
-        const lowPrice = +calculatePl(this.price, this.formValues.highPrice, this.formValues.token0Amount, this.formValues.token1Amount).toFixed(4);
-        if (lowPrice < this.price) {
+        let lowPrice = +calculatePl(this.price, this.formValues.highPrice, this.formValues.token0Amount, this.formValues.token1Amount).toFixed(4);
+        lowPrice = this.handlePriceChange(lowPrice);
           this.formValues.lowPrice = lowPrice
           this.form.setFieldsValue({
             lowPrice,
-          })
-        }
+          });
       }
       return 0
     },
 
     calculateHighPrice() {
       if (this.formValues.lowPrice && this.formValues.lowPrice <= this.price && this.formValues.token0Amount && this.formValues.token1Amount) {
-        const highPrice = +calculatePu(this.price, this.formValues.lowPrice, this.formValues.token0Amount, this.formValues.token1Amount).toFixed(4);
-        if (highPrice > this.price) {
+        let highPrice = +calculatePu(this.price, this.formValues.lowPrice, this.formValues.token0Amount, this.formValues.token1Amount).toFixed(4);
+        highPrice = this.handlePriceChange(highPrice);
           this.formValues.highPrice = highPrice
           this.form.setFieldsValue({
             highPrice,
-          })
-        }
+          });
       }
       return 0
     },
@@ -546,6 +558,17 @@ export default {
             fee: this.fee,
           })
         }
+      }
+    },
+
+    handleOnFocusChange(name) {
+      if(name === 'lowPrice' && this.formValues.lowPrice) {
+        const lowPrice = this.handlePriceChange(this.formValues.lowPrice);
+        this.handleOnChange(lowPrice, 'lowPrice')
+      }
+      if(name === 'highPrice' && this.formValues.highPrice) {
+        const highPrice = this.handlePriceChange(this.formValues.highPrice);
+        this.handleOnChange(highPrice, 'highPrice')
       }
     },
 
